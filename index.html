@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Maya — The Divine Illusion | Learn Ancient Wisdom</title>
+    <meta name="description"
+        content="Explore the profound concept of Maya from Hindu philosophy — the divine illusion that veils the eternal soul.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Particle Canvas Background -->
+    <canvas id="particles"></canvas>
+
+    <!-- Screen Effects -->
+    <div class="screen-flash" id="screenFlash"></div>
+    <div class="confetti-container" id="confettiContainer"></div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Audio Toggle -->
+    <button class="audio-toggle" id="audioToggle" aria-label="Toggle Sound">🔊</button>
+
+    <!-- Top Journey Progress Bar -->
+    <div class="journey-bar" id="journeyBar">
+        <div class="journey-track">
+            <div class="journey-fill" id="journeyFill"></div>
+        </div>
+        <div class="journey-stages" id="journeyStages">
+            <div class="journey-node active" data-stage="0"><span>ॐ</span></div>
+            <div class="journey-node" data-stage="1"><span>🌳</span></div>
+            <div class="journey-node" data-stage="2"><span>❓</span></div>
+            <div class="journey-node" data-stage="3"><span>☯</span></div>
+            <div class="journey-node" data-stage="4"><span>🎯</span></div>
+            <div class="journey-node" data-stage="5"><span>🧠</span></div>
+            <div class="journey-node" data-stage="6"><span>❓</span></div>
+            <div class="journey-node" data-stage="7"><span>⚔️</span></div>
+            <div class="journey-node" data-stage="8"><span>🏆</span></div>
+            <div class="journey-node" data-stage="9"><span>✨</span></div>
+        </div>
+    </div>
+
+    <!-- Game HUD (Points + Streak) -->
+    <div class="game-hud" id="gameHud">
+        <div class="hud-streak" id="hudStreak" style="opacity:0;">
+            <span class="streak-fire">🔥</span>
+            <span class="streak-count" id="streakCount">0</span>
+        </div>
+        <div class="hud-points">
+            <span class="hud-pts-label">PTS</span>
+            <span class="hud-pts-value" id="pointsDisplay">0</span>
+        </div>
+    </div>
+
+    <!-- Stage Slider -->
+    <div class="stage-slider" id="stageSlider">
+
+        <!-- STAGE 0: Hero -->
+        <div class="stage" id="stage-0" data-stage="0">
+            <div class="stage-content hero-stage">
+                <div class="om-symbol" id="omSymbol">ॐ</div>
+                <h1 class="hero-title">
+                    <span class="title-line title-line-1">माया</span>
+                    <span class="title-line title-line-2">The Divine Illusion</span>
+                </h1>
+                <p class="hero-subtitle">Understand that the material world is a temporary illusion (Maya) that masks
+                    the eternal soul.</p>
+                <button class="cta-btn" id="startBtn">
+                    <span>Begin Your Journey</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- STAGE 1: Lesson — The Upside-Down Tree -->
+        <div class="stage" id="stage-1" data-stage="1">
+            <div class="stage-content lesson-stage">
+                <div class="lesson-badge">LESSON 1</div>
+                <div class="lesson-layout">
+                    <div class="lesson-visual">
+                        <div class="tree-svg-container" id="treeContainer"></div>
+                    </div>
+                    <div class="lesson-text">
+                        <span class="concept-tag">The Foundation</span>
+                        <h2 class="concept-title">The Upside-Down Tree</h2>
+                        <div class="concept-sanskrit">अश्वत्थं — Ashvattha</div>
+                        <p class="concept-desc">In the Bhagavad Gita (Chapter 15), Krishna describes the material world
+                            as an <strong>inverted banyan tree</strong> — the <em>Ashvattha</em>. Its roots grow upward
+                            into the Divine, while its branches extend downward into the material world.</p>
+                        <div class="insight-cards">
+                            <div class="insight-card" data-delay="0">
+                                <div class="insight-icon">🌳</div>
+                                <div>
+                                    <h3>Roots Above</h3>
+                                    <p>The roots represent Brahman — the ultimate reality and source of all creation.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="insight-card" data-delay="1">
+                                <div class="insight-icon">🍃</div>
+                                <div>
+                                    <h3>Branches Below</h3>
+                                    <p>The branches are our senses, desires, and attachments that pull us toward worldly
+                                        existence.</p>
+                                </div>
+                            </div>
+                            <div class="insight-card" data-delay="2">
+                                <div class="insight-icon">👁️</div>
+                                <div>
+                                    <h3>The Leaves</h3>
+                                    <p>The leaves are the Vedic hymns — knowledge that sustains the tree of existence.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="continue-btn" data-next="2">Continue <span>→</span></button>
+            </div>
+        </div>
+
+        <!-- STAGE 2: Quiz — Tree Questions -->
+        <div class="stage" id="stage-2" data-stage="2">
+            <div class="stage-content quiz-stage">
+                <div class="quiz-stage-header">
+                    <div class="quiz-badge">⚡ QUICK QUIZ</div>
+                    <h2 class="quiz-stage-title">Test: The Tree of Maya</h2>
+                </div>
+                <div class="quiz-body" id="quizBody-tree">
+                    <div class="timer-ring-container" id="timerContainer-tree">
+                        <svg class="timer-ring" viewBox="0 0 80 80">
+                            <circle cx="40" cy="40" r="34" class="timer-track" />
+                            <circle cx="40" cy="40" r="34" class="timer-fill" id="timerFill-tree" />
+                        </svg>
+                        <span class="timer-text" id="timerText-tree">15</span>
+                    </div>
+                    <div class="quiz-q-counter" id="qCounter-tree">Question 1 of 2</div>
+                    <div class="quiz-question" id="quizQuestion-tree"></div>
+                    <div class="quiz-options" id="quizOptions-tree"></div>
+                    <div class="quiz-feedback" id="quizFeedback-tree"></div>
+                    <button class="quiz-next-btn" id="quizNextBtn-tree" style="display:none;">Next →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STAGE 3: Lesson — Three Gunas -->
+        <div class="stage" id="stage-3" data-stage="3">
+            <div class="stage-content lesson-stage">
+                <div class="lesson-badge">LESSON 2</div>
+                <div class="lesson-layout reverse">
+                    <div class="lesson-visual">
+                        <div class="gunas-wheel" id="gunasWheel">
+                            <div class="guna-segment sattva" data-guna="sattva">
+                                <div class="guna-icon">🪷</div>
+                            </div>
+                            <div class="guna-segment rajas" data-guna="rajas">
+                                <div class="guna-icon">🔥</div>
+                            </div>
+                            <div class="guna-segment tamas" data-guna="tamas">
+                                <div class="guna-icon">🌑</div>
+                            </div>
+                            <div class="guna-center"><span>त्रिगुण</span></div>
+                        </div>
+                    </div>
+                    <div class="lesson-text">
+                        <span class="concept-tag">The Binding Forces</span>
+                        <h2 class="concept-title">The Three Gunas</h2>
+                        <div class="concept-sanskrit">सत्त्व • रजस् • तमस्</div>
+                        <p class="concept-desc">Maya operates through three fundamental qualities (<em>Gunas</em>) that
+                            govern all of nature. Click each guna to learn more:</p>
+                        <div class="guna-details">
+                            <div class="guna-detail active" id="sattvaDetail">
+                                <div class="guna-detail-header sattva-color"><span class="guna-name">Sattva</span><span
+                                        class="guna-meaning">Goodness & Purity</span></div>
+                                <p>Leads to knowledge, happiness, and clarity. Though the highest quality, even Sattva
+                                    can bind the soul.</p>
+                                <div class="guna-traits"><span class="trait">Wisdom</span><span
+                                        class="trait">Harmony</span><span class="trait">Peace</span><span
+                                        class="trait">Light</span></div>
+                            </div>
+                            <div class="guna-detail" id="rajasDetail">
+                                <div class="guna-detail-header rajas-color"><span class="guna-name">Rajas</span><span
+                                        class="guna-meaning">Passion & Activity</span></div>
+                                <p>Born from desire and attachment, Rajas drives action, ambition, and restlessness.</p>
+                                <div class="guna-traits"><span class="trait">Desire</span><span
+                                        class="trait">Action</span><span class="trait">Ambition</span><span
+                                        class="trait">Restlessness</span></div>
+                            </div>
+                            <div class="guna-detail" id="tamasDetail">
+                                <div class="guna-detail-header tamas-color"><span class="guna-name">Tamas</span><span
+                                        class="guna-meaning">Ignorance & Inertia</span></div>
+                                <p>Born from ignorance, Tamas leads to delusion, laziness, and darkness.</p>
+                                <div class="guna-traits"><span class="trait">Darkness</span><span
+                                        class="trait">Inertia</span><span class="trait">Delusion</span><span
+                                        class="trait">Sleep</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="continue-btn" data-next="4">Continue <span>→</span></button>
+            </div>
+        </div>
+
+        <!-- STAGE 4: Activity — Match the Guna -->
+        <div class="stage" id="stage-4" data-stage="4">
+            <div class="stage-content activity-stage">
+                <div class="quiz-badge">🎯 ACTIVITY</div>
+                <h2 class="quiz-stage-title">Match the Trait to Its Guna</h2>
+                <p class="activity-instruction">Tap a trait, then tap the correct Guna it belongs to!</p>
+                <div class="match-game" id="matchGame">
+                    <div class="match-traits" id="matchTraits">
+                        <button class="match-trait" data-answer="sattva" data-trait="Wisdom">Wisdom</button>
+                        <button class="match-trait" data-answer="rajas" data-trait="Ambition">Ambition</button>
+                        <button class="match-trait" data-answer="tamas" data-trait="Delusion">Delusion</button>
+                        <button class="match-trait" data-answer="sattva" data-trait="Peace">Peace</button>
+                        <button class="match-trait" data-answer="rajas" data-trait="Desire">Desire</button>
+                        <button class="match-trait" data-answer="tamas" data-trait="Inertia">Inertia</button>
+                    </div>
+                    <div class="match-targets">
+                        <button class="match-target sattva-target" data-guna="sattva">
+                            <span class="target-icon">🪷</span>
+                            <span class="target-name">Sattva</span>
+                            <span class="target-score" id="sattvaScore">0/2</span>
+                        </button>
+                        <button class="match-target rajas-target" data-guna="rajas">
+                            <span class="target-icon">🔥</span>
+                            <span class="target-name">Rajas</span>
+                            <span class="target-score" id="rajasScore">0/2</span>
+                        </button>
+                        <button class="match-target tamas-target" data-guna="tamas">
+                            <span class="target-icon">🌑</span>
+                            <span class="target-name">Tamas</span>
+                            <span class="target-score" id="tamasScore">0/2</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="match-feedback" id="matchFeedback"></div>
+            </div>
+        </div>
+
+        <!-- STAGE 5: Lesson — Ego -->
+        <div class="stage" id="stage-5" data-stage="5">
+            <div class="stage-content lesson-stage">
+                <div class="lesson-badge">LESSON 3</div>
+                <div class="lesson-layout">
+                    <div class="lesson-visual">
+                        <div class="ego-meter" id="egoMeter">
+                            <svg viewBox="0 0 200 200" class="ego-circle">
+                                <circle cx="100" cy="100" r="90" class="ego-track" />
+                                <circle cx="100" cy="100" r="90" class="ego-fill" id="egoFill" />
+                            </svg>
+                            <div class="ego-label">
+                                <span class="ego-percent" id="egoPercent">0</span>
+                                <span class="ego-text">EGO</span>
+                            </div>
+                        </div>
+                        <div class="ego-thought" id="egoThought">💭 "I am the doer"</div>
+                    </div>
+                    <div class="lesson-text">
+                        <span class="concept-tag">The Deepest Trap</span>
+                        <h2 class="concept-title">The Ego — Ahamkara</h2>
+                        <div class="concept-sanskrit">अहंकार — Ahamkara</div>
+                        <p class="concept-desc">Maya intoxicates the mind with the <strong>"wine of ego"</strong>,
+                            making the soul falsely believe it is the "doer" of all actions.</p>
+                        <div class="ego-stages">
+                            <div class="ego-stage" data-stage="1">
+                                <div class="stage-num">1</div>
+                                <div class="stage-content">
+                                    <h4>False Identity</h4>
+                                    <p>The soul identifies with the body — "I am this body."</p>
+                                </div>
+                            </div>
+                            <div class="ego-stage" data-stage="2">
+                                <div class="stage-num">2</div>
+                                <div class="stage-content">
+                                    <h4>Sense of Doership</h4>
+                                    <p>The ego claims ownership — "I did this."</p>
+                                </div>
+                            </div>
+                            <div class="ego-stage" data-stage="3">
+                                <div class="stage-num">3</div>
+                                <div class="stage-content">
+                                    <h4>Attachment & Suffering</h4>
+                                    <p>A cycle of desire, attachment, and suffering.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="continue-btn" data-next="6">Continue <span>→</span></button>
+            </div>
+        </div>
+
+        <!-- STAGE 6: Quiz — Ego Questions -->
+        <div class="stage" id="stage-6" data-stage="6">
+            <div class="stage-content quiz-stage">
+                <div class="quiz-stage-header">
+                    <div class="quiz-badge">⚡ QUICK QUIZ</div>
+                    <h2 class="quiz-stage-title">Test: Ego & Illusion</h2>
+                </div>
+                <div class="quiz-body" id="quizBody-ego">
+                    <div class="timer-ring-container" id="timerContainer-ego">
+                        <svg class="timer-ring" viewBox="0 0 80 80">
+                            <circle cx="40" cy="40" r="34" class="timer-track" />
+                            <circle cx="40" cy="40" r="34" class="timer-fill" id="timerFill-ego" />
+                        </svg>
+                        <span class="timer-text" id="timerText-ego">15</span>
+                    </div>
+                    <div class="quiz-q-counter" id="qCounter-ego">Question 1 of 2</div>
+                    <div class="quiz-question" id="quizQuestion-ego"></div>
+                    <div class="quiz-options" id="quizOptions-ego"></div>
+                    <div class="quiz-feedback" id="quizFeedback-ego"></div>
+                    <button class="quiz-next-btn" id="quizNextBtn-ego" style="display:none;">Next →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STAGE 7: Lesson — Detachment -->
+        <div class="stage" id="stage-7" data-stage="7">
+            <div class="stage-content lesson-stage">
+                <div class="lesson-badge">LESSON 4</div>
+                <div class="lesson-layout reverse">
+                    <div class="lesson-visual">
+                        <div class="sword-container" id="swordContainer">
+                            <div class="chain chain-left" id="chainLeft">
+                                <div class="chain-link"></div>
+                                <div class="chain-link"></div>
+                                <div class="chain-link"></div>
+                            </div>
+                            <div class="sword" id="sword">
+                                <div class="sword-blade">⚔️</div>
+                                <div class="sword-label">Knowledge</div>
+                            </div>
+                            <div class="chain chain-right" id="chainRight">
+                                <div class="chain-link"></div>
+                                <div class="chain-link"></div>
+                                <div class="chain-link"></div>
+                            </div>
+                        </div>
+                        <div class="surrender-heart" id="surrenderHeart">💜 Surrender</div>
+                    </div>
+                    <div class="lesson-text">
+                        <span class="concept-tag">The Path to Freedom</span>
+                        <h2 class="concept-title">Detachment — Vairagya</h2>
+                        <div class="concept-sanskrit">वैराग्य — Vairagya</div>
+                        <p class="concept-desc">Use the <strong>"sword of knowledge"</strong> and
+                            <strong>detachment</strong> to break through the illusion. Click the sword to cut the
+                            chains!</p>
+                        <div class="freedom-steps">
+                            <div class="freedom-step" data-step="1">
+                                <div class="step-icon">📖</div>
+                                <h4>Jnana (Knowledge)</h4>
+                                <p>Discriminate between the real and unreal.</p>
+                            </div>
+                            <div class="freedom-step" data-step="2">
+                                <div class="step-icon">🧘</div>
+                                <h4>Vairagya (Detachment)</h4>
+                                <p>Practice non-attachment to the fruits of actions.</p>
+                            </div>
+                            <div class="freedom-step" data-step="3">
+                                <div class="step-icon">🙏</div>
+                                <h4>Sharanagati (Surrender)</h4>
+                                <p>Surrender the ego completely to the Divine.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="continue-btn" data-next="8">Continue <span>→</span></button>
+            </div>
+        </div>
+
+        <!-- STAGE 8: Final Challenge -->
+        <div class="stage" id="stage-8" data-stage="8">
+            <div class="stage-content quiz-stage">
+                <div class="quiz-stage-header">
+                    <div class="quiz-badge final-badge">🏆 FINAL CHALLENGE</div>
+                    <h2 class="quiz-stage-title">Ultimate Wisdom Test</h2>
+                    <p class="quiz-stage-sub">3 questions across all concepts. Speed matters!</p>
+                </div>
+                <div class="quiz-body" id="quizBody-final">
+                    <div class="timer-ring-container" id="timerContainer-final">
+                        <svg class="timer-ring" viewBox="0 0 80 80">
+                            <circle cx="40" cy="40" r="34" class="timer-track" />
+                            <circle cx="40" cy="40" r="34" class="timer-fill" id="timerFill-final" />
+                        </svg>
+                        <span class="timer-text" id="timerText-final">15</span>
+                    </div>
+                    <div class="quiz-q-counter" id="qCounter-final">Question 1 of 3</div>
+                    <div class="quiz-question" id="quizQuestion-final"></div>
+                    <div class="quiz-options" id="quizOptions-final"></div>
+                    <div class="quiz-feedback" id="quizFeedback-final"></div>
+                    <button class="quiz-next-btn" id="quizNextBtn-final" style="display:none;">Next →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STAGE 9: Results -->
+        <div class="stage" id="stage-9" data-stage="9">
+            <div class="stage-content results-stage">
+                <div class="result-circle">
+                    <svg viewBox="0 0 200 200">
+                        <circle cx="100" cy="100" r="85" class="result-track" />
+                        <circle cx="100" cy="100" r="85" class="result-fill" id="resultFill" />
+                    </svg>
+                    <div class="result-score" id="resultScore">0/7</div>
+                </div>
+                <h3 class="result-title" id="resultTitle"></h3>
+                <p class="result-message" id="resultMessage"></p>
+                <div class="stats-dashboard" id="statsDashboard">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statAccuracy">0%</div>
+                        <div class="stat-label">Accuracy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statAvgTime">0s</div>
+                        <div class="stat-label">Avg Speed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statStreak">0</div>
+                        <div class="stat-label">Best Streak</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statPoints">0</div>
+                        <div class="stat-label">Total Points</div>
+                    </div>
+                </div>
+                <div class="footer-wisdom">
+                    <div class="footer-quote">"When one realizes the Self, in whom all life is one — then one fears no
+                        more."</div>
+                    <div class="footer-source">— Isha Upanishad</div>
+                </div>
+                <button class="cta-btn" id="retryBtn">⚡ Play Again</button>
+            </div>
+        </div>
+
+    </div><!-- /stage-slider -->
+
+    <script src="app.js"></script>
+</body>
+
+</html>
