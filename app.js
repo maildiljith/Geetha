@@ -39,7 +39,13 @@ class Particle {
     draw() {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(${this.hue}, 60%, 70%, ${this.opacity})`;
+
+        // Theme-aware particles
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const lightness = isDark ? 70 : 40; // Darker particles in light mode
+        const saturation = isDark ? 60 : 40; // Less saturated in light mode
+
+        ctx.fillStyle = `hsla(${this.hue}, ${saturation}%, ${lightness}%, ${this.opacity})`;
         ctx.fill();
     }
 }
@@ -137,6 +143,38 @@ audioToggleBtn.addEventListener('click', () => {
     audioToggleBtn.classList.toggle('muted', !audioEnabled);
 });
 
+// Theme Toggle
+const themeToggleBtn = document.getElementById('themeToggle');
+const savedTheme = localStorage.getItem('mayaTheme') || 'light';
+
+// Home Button
+const homeBtn = document.getElementById('homeBtn');
+homeBtn.addEventListener('click', () => {
+    goToStage(0);
+});
+
+// Set initial theme preference
+let isDarkMode = false; // Moved declaration here to avoid redeclaration issues
+const currentSavedTheme = localStorage.getItem('mayaTheme'); // Renamed to avoid redeclaration
+if (currentSavedTheme === 'dark') {
+    isDarkMode = true;
+    document.documentElement.setAttribute('data-theme', 'dark');
+    themeToggleBtn.textContent = '☀️';
+}
+
+themeToggleBtn.addEventListener('click', () => {
+    isDarkMode = !isDarkMode;
+    if (isDarkMode) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        themeToggleBtn.textContent = '☀️';
+        localStorage.setItem('mayaTheme', 'dark');
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+        themeToggleBtn.textContent = '🌙';
+        localStorage.setItem('mayaTheme', 'light');
+    }
+});
+
 
 // ============================================
 // EFFECTS: Confetti, Flash, Shake, Toast
@@ -229,11 +267,74 @@ function nextStage() {
     goToStage(currentStage + 1);
 }
 
-// Start button
+// ============================================
+// CHAPTER NAVIGATION & UNLOCKING
+// ============================================
+
+// Check saved progress
+const savedProgress = parseInt(localStorage.getItem('mayaProgress') || '1');
+
+// Setup Chapter 1
 document.getElementById('startBtn').addEventListener('click', () => {
     ensureAudioCtx();
     nextStage();
 });
+
+// Setup Chapter 2 & 3 Unlock State
+const chapter2Btn = document.getElementById('chapter2Btn');
+const chapter3Btn = document.getElementById('chapter3Btn');
+
+function updateChapterUI() {
+    // Unlock Chapter 2 if progress >= 2
+    if (savedProgress >= 2 && chapter2Btn) {
+        chapter2Btn.classList.remove('locked');
+        chapter2Btn.classList.add('active');
+        chapter2Btn.disabled = false;
+        const iconInfo = chapter2Btn.querySelector('.chapter-icon');
+        if (iconInfo) iconInfo.textContent = '🌟';
+        const nameInfo = chapter2Btn.querySelector('.chapter-name');
+        if (nameInfo) nameInfo.textContent = 'Karma';
+    }
+
+    // Unlock Chapter 3 if progress >= 3
+    if (savedProgress >= 3 && chapter3Btn) {
+        chapter3Btn.classList.remove('locked');
+        chapter3Btn.classList.add('active');
+        chapter3Btn.disabled = false;
+        const iconInfo = chapter3Btn.querySelector('.chapter-icon');
+        if (iconInfo) iconInfo.textContent = '⚖️';
+        const nameInfo = chapter3Btn.querySelector('.chapter-name');
+        if (nameInfo) nameInfo.textContent = 'Dharma';
+    }
+}
+
+// Call initially
+updateChapterUI();
+
+// Chapter Click Handlers
+if (chapter2Btn) {
+    chapter2Btn.addEventListener('click', () => {
+        if (chapter2Btn.classList.contains('locked')) {
+            showToast('Complete Chapter 1 to unlock Karma', '🔒');
+            playWrongSound();
+        } else {
+            showToast('Chapter 2: Karma is coming soon!', '🌟');
+            playCorrectSound();
+        }
+    });
+}
+
+if (chapter3Btn) {
+    chapter3Btn.addEventListener('click', () => {
+        if (chapter3Btn.classList.contains('locked')) {
+            showToast('Complete Chapter 2 to unlock Dharma', '🔒');
+            playWrongSound();
+        } else {
+            showToast('Chapter 3: Dharma is coming soon!', '⚖️');
+            playCorrectSound();
+        }
+    });
+}
 
 // Continue buttons
 document.querySelectorAll('.continue-btn').forEach(btn => {
@@ -242,6 +343,7 @@ document.querySelectorAll('.continue-btn').forEach(btn => {
         goToStage(next);
     });
 });
+
 
 
 // ============================================

@@ -24,8 +24,16 @@
     <div class="confetti-container" id="confettiContainer"></div>
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- Audio Toggle -->
-    <button class="audio-toggle" id="audioToggle" aria-label="Toggle Sound">🔊</button>
+    <!-- Top Left Controls -->
+    <div class="top-controls">
+        <button class="home-btn" id="homeBtn" aria-label="Home">🏠</button>
+    </div>
+
+    <!-- Bottom Right Controls -->
+    <div class="bottom-controls">
+        <button class="audio-toggle" id="audioToggle" aria-label="Toggle Sound">🔊</button>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">🌙</button>
+    </div>
 
     <!-- Top Journey Progress Bar -->
     <div class="journey-bar" id="journeyBar">
@@ -71,12 +79,42 @@
                 </h1>
                 <p class="hero-subtitle">Understand that the material world is a temporary illusion (Maya) that masks
                     the eternal soul.</p>
-                <button class="cta-btn" id="startBtn">
-                    <span>Begin Your Journey</span>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M5 12h14M12 5l7 7-7 7" />
-                    </svg>
-                </button>
+
+                <div class="chapters-path">
+                    <button class="chapter-node active" id="startBtn">
+                        <div class="chapter-icon-wrapper">
+                            <div class="chapter-icon">✨</div>
+                        </div>
+                        <div class="chapter-info">
+                            <span class="chapter-num">Chapter 1</span>
+                            <span class="chapter-name">Maya</span>
+                        </div>
+                    </button>
+
+                    <div class="path-connector"></div>
+
+                    <button class="chapter-node locked" id="chapter2Btn" disabled>
+                        <div class="chapter-icon-wrapper">
+                            <div class="chapter-icon">🔒</div>
+                        </div>
+                        <div class="chapter-info">
+                            <span class="chapter-num">Chapter 2</span>
+                            <span class="chapter-name">Karma (Coming Soon)</span>
+                        </div>
+                    </button>
+
+                    <div class="path-connector"></div>
+
+                    <button class="chapter-node locked" id="chapter3Btn" disabled>
+                        <div class="chapter-icon-wrapper">
+                            <div class="chapter-icon">🔒</div>
+                        </div>
+                        <div class="chapter-info">
+                            <span class="chapter-num">Chapter 3</span>
+                            <span class="chapter-name">Dharma (Coming Soon)</span>
+                        </div>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -353,7 +391,8 @@
                         <div class="concept-sanskrit">वैराग्य — Vairagya</div>
                         <p class="concept-desc">Use the <strong>"sword of knowledge"</strong> and
                             <strong>detachment</strong> to break through the illusion. Click the sword to cut the
-                            chains!</p>
+                            chains!
+                        </p>
                         <div class="freedom-steps">
                             <div class="freedom-step" data-step="1">
                                 <div class="step-icon">📖</div>
