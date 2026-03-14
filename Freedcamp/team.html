@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team Performance — Freedcamp</title>
+  <meta name="description" content="Individual team member performance dashboard for active Freedcamp tasks." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="team.css" />
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="auth.js"></script>
+</head>
+<body class="team-body">
+
+  <!-- Loading -->
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <span class="spinner-label">Fetching team data…</span>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="brand">
+      <a href="/" class="back-btn">← Overview</a>
+      <div class="brand-logo">FC</div>
+      <div>
+        <div class="brand-title">Team Performance</div>
+        <div class="brand-sub" id="last-updated">Loading…</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="date-chip" id="date-chip"></div>
+      <button class="refresh-btn" id="refresh-btn">⟳ Refresh</button>
+      <button class="refresh-btn" onclick="logout()" style="background: rgba(255,94,126,0.1); border-color: rgba(255,94,126,0.2); color: #ff5e7e;">Logout</button>
+    </div>
+  </header>
+
+  <!-- Error -->
+  <div id="error-banner"></div>
+
+  <main class="team-layout">
+
+    <!-- ── Top Summary Bar ── -->
+    <section class="team-summary-bar">
+      <div class="tsb-card glass">
+        <div class="tsb-val" id="ts-members">—</div>
+        <div class="tsb-lbl">Active Members</div>
+      </div>
+      <div class="tsb-card glass">
+        <div class="tsb-val blue" id="ts-active">—</div>
+        <div class="tsb-lbl">Live Tasks</div>
+      </div>
+      <div class="tsb-card glass">
+        <div class="tsb-val red" id="ts-overdue">—</div>
+        <div class="tsb-lbl">Overdue</div>
+      </div>
+      <div class="tsb-card glass">
+        <div class="tsb-val amber" id="ts-soon">—</div>
+        <div class="tsb-lbl">Due This Week</div>
+      </div>
+      <div class="tsb-card glass warn-card-unassigned">
+        <div class="tsb-val purple" id="ts-unassigned">—</div>
+        <div class="tsb-lbl">Unassigned</div>
+      </div>
+      <div class="tsb-card glass warn-card-nodue">
+        <div class="tsb-val amber" id="ts-nodue">—</div>
+        <div class="tsb-lbl">No Due Date</div>
+      </div>
+    </section>
+
+    <!-- ── Alert Rows ── -->
+    <section class="team-alerts" id="team-alerts"></section>
+
+    <!-- ── Member Scorecards Grid ── -->
+    <section class="team-grid-wrap">
+      <div class="section-header">
+        <h2 class="section-title">Individual Scorecards</h2>
+        <div class="sort-pills">
+          <span class="sort-label">Sort by:</span>
+          <button class="pill active" data-sort="overdue">Most Overdue</button>
+          <button class="pill" data-sort="active">Most Active</button>
+          <button class="pill" data-sort="name">Name</button>
+        </div>
+      </div>
+      <div class="team-grid" id="team-grid">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Detail Drawer ── -->
+  <div id="drawer-overlay" class="drawer-overlay"></div>
+  <aside id="member-drawer" class="member-drawer">
+    <div class="drawer-header">
+      <div class="drawer-person">
+        <div class="drawer-avatar" id="drawer-avatar"></div>
+        <div>
+          <div class="drawer-name" id="drawer-name"></div>
+          <div class="drawer-meta" id="drawer-meta"></div>
+        </div>
+      </div>
+      <button class="drawer-close" id="drawer-close">✕</button>
+    </div>
+
+    <div class="drawer-kpis" id="drawer-kpis"></div>
+
+    <div class="drawer-section-title">Active Tasks</div>
+    <div class="drawer-tasks" id="drawer-tasks"></div>
+  </aside>
+
+  <script src="api.js"></script>
+  <script src="team.js"></script>
+</body>
+</html>

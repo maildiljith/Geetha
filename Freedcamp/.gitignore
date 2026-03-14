@@ -1,0 +1,6 @@
+node_modules/
+functions/node_modules/
+.env
+*.log
+all_projects.json
+deploy_error.log

@@ -1,0 +1,15 @@
+{
+  "name": "freedcamp-dashboard",
+  "version": "1.0.0",
+  "description": "CEO Dashboard for Freedcamp with Firebase Auth",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "crypto": "^1.0.1"
+  }
+}

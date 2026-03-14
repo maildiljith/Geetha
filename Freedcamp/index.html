@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CEO Dashboard — Freedcamp</title>
+  <meta name="description" content="Executive overview of Freedcamp milestones, project health, and team performance." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="auth.js"></script>
+</head>
+<body>
+
+  <!-- Loading -->
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <span class="spinner-label">Verifying access…</span>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="brand">
+      <div class="brand-logo">FC</div>
+      <div>
+        <div class="brand-title">Executive Dashboard</div>
+        <div class="brand-sub" id="last-updated">Secure Freedcamp Overview</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="date-chip" id="date-chip"></div>
+      <a href="/team" class="nav-btn">👥 Team Performance</a>
+      <button class="refresh-btn" id="refresh-btn">⟳ Refresh</button>
+      <button class="refresh-btn" onclick="logout()" style="background: rgba(255,94,126,0.1); border-color: rgba(255,94,126,0.2); color: #ff5e7e;">Logout</button>
+    </div>
+  </header>
+
+  <!-- Error -->
+  <div id="error-banner"></div>
+
+  <main class="ceo-layout">
+
+    <!-- ── Row 1: Health Score + KPIs ── -->
+    <section class="row-top">
+
+      <!-- Health Score -->
+      <div class="health-card glass">
+        <div class="health-label">Overall Health</div>
+        <div class="health-ring-wrap">
+          <canvas id="health-chart" width="160" height="160"></canvas>
+          <div class="health-center">
+            <span class="health-score" id="health-score">—</span>
+            <span class="health-grade" id="health-grade"></span>
+          </div>
+        </div>
+        <div class="health-meta" id="health-meta"></div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpis-grid">
+        <div class="kpi-card glass blue">
+          <div class="kpi-icon">🗂</div>
+          <div class="kpi-value" id="k-projects">—</div>
+          <div class="kpi-label">Projects</div>
+        </div>
+        <div class="kpi-card glass purple">
+          <div class="kpi-icon">🏁</div>
+          <div class="kpi-value" id="k-milestones">—</div>
+          <div class="kpi-label">Milestones</div>
+        </div>
+        <div class="kpi-card glass green">
+          <div class="kpi-icon">✅</div>
+          <div class="kpi-value" id="k-ms-done">—</div>
+          <div class="kpi-label">Completed</div>
+        </div>
+        <div class="kpi-card glass red">
+          <div class="kpi-icon">⚠️</div>
+          <div class="kpi-value" id="k-overdue">—</div>
+          <div class="kpi-label">Overdue</div>
+        </div>
+        <div class="kpi-card glass amber">
+          <div class="kpi-icon">📋</div>
+          <div class="kpi-value" id="k-tasks-pct">—</div>
+          <div class="kpi-label">Tasks Done</div>
+          <div class="kpi-sub" id="k-tasks-sub"></div>
+        </div>
+        <div class="kpi-card glass teal">
+          <div class="kpi-icon">👥</div>
+          <div class="kpi-value" id="k-members">—</div>
+          <div class="kpi-label">Team Members</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Row 2: Milestone Breakdown + Team Leaderboard ── -->
+    <section class="row-mid">
+
+      <!-- Milestone Breakdown -->
+      <div class="panel glass">
+        <div class="panel-header">
+          <h2 class="panel-title">Milestone Progress</h2>
+          <div class="milestone-legend" id="ms-legend"></div>
+        </div>
+        <div class="ms-chart-wrap">
+          <canvas id="ms-chart" width="200" height="200"></canvas>
+          <div class="ms-center-label">
+            <div class="ms-big" id="ms-inprogress-count">—</div>
+            <div class="ms-small">In Progress</div>
+          </div>
+        </div>
+        <div class="ms-status-row" id="ms-status-row"></div>
+      </div>
+
+      <!-- Team Leaderboard -->
+      <div class="panel glass" style="flex:2">
+        <div class="panel-header">
+          <h2 class="panel-title">Team Performance</h2>
+          <span class="panel-sub" id="team-sub"></span>
+        </div>
+        <div class="leaderboard" id="leaderboard">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ── Row 3: Upcoming Milestones ── -->
+    <section class="row-bottom">
+      <div class="panel glass" style="width:100%">
+        <div class="panel-header">
+          <h2 class="panel-title">Milestone Tracker</h2>
+          <div class="ms-filter-pills" id="ms-filter-pills">
+            <button class="pill active" data-filter="all">All</button>
+            <button class="pill" data-filter="in-progress">In Progress</button>
+            <button class="pill" data-filter="completed">Completed</button>
+            <button class="pill" data-filter="overdue">Overdue</button>
+          </div>
+        </div>
+        <div class="ms-cards-wrap" id="ms-cards-wrap">
+          <!-- Milestone cards rendered by JS -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+
+  <!-- ── Milestone Detail Modal ── -->
+  <div id="modal-overlay" class="drawer-overlay"></div>
+  <aside id="milestone-drawer" class="member-drawer">
+    <div class="drawer-header">
+      <div class="drawer-person">
+        <div class="drawer-logo" id="ms-modal-icon">🏁</div>
+        <div>
+          <div class="drawer-name" id="ms-modal-title">Milestone Details</div>
+          <div class="drawer-meta" id="ms-modal-project">Project Name</div>
+        </div>
+      </div>
+      <button class="drawer-close" id="ms-modal-close">✕</button>
+    </div>
+
+    <div class="drawer-kpis">
+      <div class="dk-item"><span class="dk-val" id="ms-modal-tasks-total">—</span><span class="dk-lbl">Total Tasks</span></div>
+      <div class="dk-item"><span class="dk-val" id="ms-modal-tasks-done" style="color:#00e5a0">—</span><span class="dk-lbl">Completed</span></div>
+      <div class="dk-item"><span class="dk-val" id="ms-modal-due" style="color:#ffb740">—</span><span class="dk-lbl">Due Date</span></div>
+      <div class="dk-item"><span class="dk-val" id="ms-modal-status">—</span><span class="dk-lbl">Status</span></div>
+    </div>
+
+    <div class="drawer-section-title">Tasks in this Milestone</div>
+    <div class="drawer-tasks" id="ms-modal-tasks-list"></div>
+  </aside>
+
+  <script src="api.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
