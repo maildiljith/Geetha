@@ -476,7 +476,235 @@
                         more."</div>
                     <div class="footer-source">— Isha Upanishad</div>
                 </div>
-                <button class="cta-btn" id="retryBtn">⚡ Play Again</button>
+                <div class="result-actions">
+                    <button class="cta-btn secondary" id="retryBtn">⚡ Play Again</button>
+                    <button class="cta-btn" id="continueKarmaBtn" style="display:none;">Next Chapter
+                        <span>→</span></button>
+                    <button class="cta-btn" id="homeFromResults1Btn">🏠 Return Home</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- CHAPTER 2: KARMA -->
+        <!-- ========================================== -->
+
+        <!-- STAGE 10: Lesson 5 — The Wheel of Karma -->
+        <div class="stage" id="stage-10" data-stage="10">
+            <div class="stage-content lesson-stage">
+                <div class="lesson-badge">LESSON 5</div>
+                <div class="lesson-layout">
+                    <div class="lesson-visual">
+                        <div class="karma-wheel-container">
+                            <div class="karma-wheel-svg" id="karmaWheelSvg">
+                                ☸️
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lesson-text">
+                        <span class="concept-tag">The Law of Action</span>
+                        <h2 class="concept-title">The Wheel of Karma</h2>
+                        <div class="concept-sanskrit">कर्म — Action & Reaction</div>
+                        <p class="concept-desc">Karma literally means <strong>action</strong>. It is the universal
+                            principle of cause and effect. Every action, word, and thought creates an energetic imprint
+                            that returns to us.</p>
+                        <div class="insight-cards">
+                            <div class="insight-card" data-delay="0">
+                                <div class="insight-icon">🌱</div>
+                                <div>
+                                    <h3>As You Sow</h3>
+                                    <p>Your present reality is the harvest of your past actions. You are the architect
+                                        of your destiny.</p>
+                                </div>
+                            </div>
+                            <div class="insight-card" data-delay="1">
+                                <div class="insight-icon">🔄</div>
+                                <div>
+                                    <h3>The Endless Cycle</h3>
+                                    <p>Unresolved karma binds the soul to Samsara — the continuous cycle of birth,
+                                        death, and rebirth.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="continue-btn" data-next="11">Continue <span>→</span></button>
+            </div>
+        </div>
+
+        <!-- STAGE 11: Quiz — Karma Basics -->
+        <div class="stage" id="stage-11" data-stage="11">
+            <div class="stage-content quiz-stage">
+                <div class="quiz-stage-header">
+                    <div class="quiz-badge">⚡ QUICK QUIZ</div>
+                    <h2 class="quiz-stage-title">Test: The Law of Karma</h2>
+                </div>
+                <div class="quiz-body" id="quizBody-karma1">
+                    <div class="timer-ring-container" id="timerContainer-karma1">
+                        <svg class="timer-ring" viewBox="0 0 80 80">
+                            <circle cx="40" cy="40" r="34" class="timer-track" />
+                            <circle cx="40" cy="40" r="34" class="timer-fill" id="timerFill-karma1" />
+                        </svg>
+                        <span class="timer-text" id="timerText-karma1">15</span>
+                    </div>
+                    <div class="quiz-q-counter" id="qCounter-karma1">Question 1 of 2</div>
+                    <div class="quiz-question" id="quizQuestion-karma1"></div>
+                    <div class="quiz-options" id="quizOptions-karma1"></div>
+                    <div class="quiz-feedback" id="quizFeedback-karma1"></div>
+                    <button class="quiz-next-btn" id="quizNextBtn-karma1" style="display:none;">Next →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STAGE 12: Lesson 6 — The Three Types of Karma -->
+        <div class="stage" id="stage-12" data-stage="12">
+            <div class="stage-content lesson-stage">
+                <div class="lesson-badge">LESSON 6</div>
+                <div class="lesson-layout reverse">
+                    <div class="lesson-visual">
+                        <div class="karma-vessels">
+                            <div class="vessel" id="vesselSanchita">
+                                <div class="vessel-icon">🏺</div>
+                                <div class="vessel-label">Sanchita</div>
+                                <div class="vessel-water"></div>
+                            </div>
+                            <div class="vessel-arrow">↓</div>
+                            <div class="vessel" id="vesselPrarabdha">
+                                <div class="vessel-icon">⏳</div>
+                                <div class="vessel-label">Prarabdha</div>
+                                <div class="vessel-water"></div>
+                            </div>
+                            <div class="vessel-drop">💧</div>
+                            <div class="vessel" id="vesselAgami">
+                                <div class="vessel-icon">🏗️</div>
+                                <div class="vessel-label">Agami</div>
+                                <div class="vessel-water empty"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lesson-text">
+                        <span class="concept-tag">The Vault of Actions</span>
+                        <h2 class="concept-title">Three Kinds of Karma</h2>
+                        <div class="concept-sanskrit">संचित • प्रारब्ध • आगामी</div>
+                        <p class="concept-desc">Karma is not just happening now; it's a vast repository spanning
+                            timelines. Tap the vessels to see how they work.</p>
+                        <div class="guna-details">
+                            <div class="guna-detail active" id="sanchitaDetail">
+                                <div class="guna-detail-header sattva-color"><span
+                                        class="guna-name">Sanchita</span><span class="guna-meaning">The Vast
+                                        Reservoir</span></div>
+                                <p>The accumulated sum of all past actions from countless lifetimes. It is the vast
+                                    warehouse of pending karma, most of which is dormant.</p>
+                            </div>
+                            <div class="guna-detail" id="prarabdhaDetail">
+                                <div class="guna-detail-header rajas-color"><span
+                                        class="guna-name">Prarabdha</span><span class="guna-meaning">Bearing Fruit
+                                        Now</span></div>
+                                <p>The portion of Sanchita karma chosen for this specific lifetime. It dictates your
+                                    body, family, and inevitable life situations. You cannot change it, only how you
+                                    react to it.</p>
+                            </div>
+                            <div class="guna-detail" id="agamiDetail">
+                                <div class="guna-detail-header tamas-color"><span class="guna-name">Agami</span><span
+                                        class="guna-meaning">Future Creations</span></div>
+                                <p>The new karma you are generating right now through your current choices. This is
+                                    where your free will exists.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="continue-btn" data-next="13">Continue <span>→</span></button>
+            </div>
+        </div>
+
+        <!-- STAGE 13: Activity 3 — Sorting Actions -->
+        <div class="stage" id="stage-13" data-stage="13">
+            <div class="stage-content activity-stage">
+                <div class="quiz-badge">🎯 ACTIVITY</div>
+                <h2 class="quiz-stage-title">Binding vs. Liberating</h2>
+                <p class="activity-instruction">Is this action Binding (creates Karma) or Liberating (Nishkama Karma)?
+                </p>
+                <div class="sorting-game" id="sortingGame">
+                    <div class="sorting-card-container">
+                        <div class="sorting-card" id="sortingCard">
+                            <div class="sorting-scenario" id="sortingScenario">Donating to charity to look good on
+                                social media</div>
+                        </div>
+                    </div>
+                    <div class="sorting-actions">
+                        <button class="sort-btn binding" data-type="binding">🔗 Binding</button>
+                        <button class="sort-btn liberating" data-type="liberating">🕊️ Liberating</button>
+                    </div>
+                </div>
+                <div class="sorting-progress" id="sortingProgress">0/4 Sorted</div>
+                <div class="match-feedback" id="sortingFeedback"></div>
+            </div>
+        </div>
+
+        <!-- STAGE 14: Final Challenge 2 -->
+        <div class="stage" id="stage-14" data-stage="14">
+            <div class="stage-content quiz-stage">
+                <div class="quiz-stage-header">
+                    <div class="quiz-badge final-badge">🏆 FINAL CHALLENGE</div>
+                    <h2 class="quiz-stage-title">Karma Mastery</h2>
+                    <p class="quiz-stage-sub">3 questions to prove your understanding.</p>
+                </div>
+                <div class="quiz-body" id="quizBody-karmaFinal">
+                    <div class="timer-ring-container" id="timerContainer-karmaFinal">
+                        <svg class="timer-ring" viewBox="0 0 80 80">
+                            <circle cx="40" cy="40" r="34" class="timer-track" />
+                            <circle cx="40" cy="40" r="34" class="timer-fill" id="timerFill-karmaFinal" />
+                        </svg>
+                        <span class="timer-text" id="timerText-karmaFinal">15</span>
+                    </div>
+                    <div class="quiz-q-counter" id="qCounter-karmaFinal">Question 1 of 3</div>
+                    <div class="quiz-question" id="quizQuestion-karmaFinal"></div>
+                    <div class="quiz-options" id="quizOptions-karmaFinal"></div>
+                    <div class="quiz-feedback" id="quizFeedback-karmaFinal"></div>
+                    <button class="quiz-next-btn" id="quizNextBtn-karmaFinal" style="display:none;">Next →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STAGE 15: Results Chapter 2 -->
+        <div class="stage" id="stage-15" data-stage="15">
+            <div class="stage-content results-stage">
+                <div class="result-circle">
+                    <svg viewBox="0 0 200 200">
+                        <circle cx="100" cy="100" r="85" class="result-track" />
+                        <circle cx="100" cy="100" r="85" class="result-fill" id="resultFill2" />
+                    </svg>
+                    <div class="result-score" id="resultScore2">0/9</div>
+                </div>
+                <h3 class="result-title" id="resultTitle2"></h3>
+                <p class="result-message" id="resultMessage2"></p>
+                <div class="stats-dashboard" id="statsDashboard2">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statAccuracy2">0%</div>
+                        <div class="stat-label">Accuracy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statAvgTime2">0s</div>
+                        <div class="stat-label">Avg Speed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statStreak2">0</div>
+                        <div class="stat-label">Best Streak</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statPoints2">0</div>
+                        <div class="stat-label">Total Points</div>
+                    </div>
+                </div>
+                <div class="footer-wisdom">
+                    <div class="footer-quote">"To action alone hast thou a right and never at all to its fruits; let not
+                        the fruits of action be thy motive."</div>
+                    <div class="footer-source">— Bhagavad Gita 2.47</div>
+                </div>
+                <div class="result-actions">
+                    <button class="cta-btn secondary" id="retryKarmaBtn">⚡ Play Again</button>
+                    <button class="cta-btn" id="homeFromKarmaBtn">🏠 Return Home</button>
+                </div>
             </div>
         </div>
 

@@ -32,6 +32,15 @@
     </div>
     <div class="header-right">
       <div class="date-chip" id="date-chip"></div>
+      <div class="project-filter-wrap">
+        <select id="area-select" class="project-select">
+          <option value="all">All Areas</option>
+        </select>
+        <select id="project-select" class="project-select">
+          <option value="all">All Projects</option>
+        </select>
+      </div>
+      <a href="/tasks" class="nav-btn">📋 Tasks</a>
       <a href="/team" class="nav-btn">👥 Team Performance</a>
       <button class="refresh-btn" id="refresh-btn">⟳ Refresh</button>
       <button class="refresh-btn" onclick="logout()" style="background: rgba(255,94,126,0.1); border-color: rgba(255,94,126,0.2); color: #ff5e7e;">Logout</button>
@@ -47,7 +56,7 @@
     <section class="row-top">
 
       <!-- Health Score -->
-      <div class="health-card glass">
+      <div class="health-card glass" id="kpi-health" style="cursor: pointer;">
         <div class="health-label">Overall Health</div>
         <div class="health-ring-wrap">
           <canvas id="health-chart" width="160" height="160"></canvas>
@@ -61,33 +70,33 @@
 
       <!-- KPIs -->
       <div class="kpis-grid">
-        <div class="kpi-card glass blue">
+        <div class="kpi-card glass blue" id="kpi-projects">
           <div class="kpi-icon">🗂</div>
           <div class="kpi-value" id="k-projects">—</div>
           <div class="kpi-label">Projects</div>
         </div>
-        <div class="kpi-card glass purple">
+        <div class="kpi-card glass purple" id="kpi-milestones">
           <div class="kpi-icon">🏁</div>
           <div class="kpi-value" id="k-milestones">—</div>
           <div class="kpi-label">Milestones</div>
         </div>
-        <div class="kpi-card glass green">
+        <div class="kpi-card glass green" id="kpi-ms-done">
           <div class="kpi-icon">✅</div>
           <div class="kpi-value" id="k-ms-done">—</div>
           <div class="kpi-label">Completed</div>
         </div>
-        <div class="kpi-card glass red">
+        <div class="kpi-card glass red" id="kpi-overdue">
           <div class="kpi-icon">⚠️</div>
           <div class="kpi-value" id="k-overdue">—</div>
           <div class="kpi-label">Overdue</div>
         </div>
-        <div class="kpi-card glass amber">
+        <div class="kpi-card glass amber" id="kpi-tasks">
           <div class="kpi-icon">📋</div>
           <div class="kpi-value" id="k-tasks-pct">—</div>
           <div class="kpi-label">Tasks Done</div>
           <div class="kpi-sub" id="k-tasks-sub"></div>
         </div>
-        <div class="kpi-card glass teal">
+        <div class="kpi-card glass teal" id="kpi-members">
           <div class="kpi-icon">👥</div>
           <div class="kpi-value" id="k-members">—</div>
           <div class="kpi-label">Team Members</div>
@@ -130,8 +139,11 @@
     <!-- ── Row 3: Upcoming Milestones ── -->
     <section class="row-bottom">
       <div class="panel glass" style="width:100%">
-        <div class="panel-header">
-          <h2 class="panel-title">Milestone Tracker</h2>
+        <div class="panel-header" style="justify-content: flex-start; gap: 32px;">
+          <div class="dashboard-tabs">
+            <button class="tab-btn active" data-tab="milestones">Milestone Tracker</button>
+            <button class="tab-btn" data-tab="tasks">Task Explorer</button>
+          </div>
           <div class="ms-filter-pills" id="ms-filter-pills">
             <button class="pill active" data-filter="all">All</button>
             <button class="pill" data-filter="in-progress">In Progress</button>
@@ -139,8 +151,18 @@
             <button class="pill" data-filter="overdue">Overdue</button>
           </div>
         </div>
-        <div class="ms-cards-wrap" id="ms-cards-wrap">
-          <!-- Milestone cards rendered by JS -->
+        <div id="milestones-view" class="tab-view active">
+          <div class="ms-cards-wrap" id="ms-cards-wrap">
+            <!-- Milestone cards rendered by JS -->
+          </div>
+        </div>
+        <div id="tasks-view" class="tab-view">
+          <div class="task-analysis-bar" id="task-analysis-bar">
+            <!-- Task stats cards rendered by JS -->
+          </div>
+          <div class="drawer-tasks" id="tab-tasks-list" style="max-height: 600px;">
+            <!-- Task list rendered by JS -->
+          </div>
         </div>
       </div>
     </section>

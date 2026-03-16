@@ -261,8 +261,8 @@ body {
    ============================================ */
 .stage-slider {
     display: flex;
-    width: 1000vw;
-    /* 10 stages × 100vw */
+    width: 1600vw;
+    /* 16 stages × 100vw */
     height: 100vh;
     transition: transform 0.7s var(--ease-out);
 }
@@ -1915,6 +1915,202 @@ body.shake {
     75% {
         transform: translateX(-4px);
     }
+}
+
+/* ============================================
+   CHAPTER 2: KARMA COMPONENTS
+   ============================================ */
+
+/* The Wheel of Karma */
+.karma-wheel-container {
+    width: 250px;
+    height: 250px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle at center, var(--bg-glass-hover), transparent 70%);
+    border-radius: 50%;
+    border: 1px dashed var(--gold);
+    box-shadow: 0 0 30px var(--gold-glow);
+    animation: rotate 20s linear infinite;
+}
+
+.karma-wheel-svg {
+    font-size: 150px;
+    line-height: 1;
+    filter: drop-shadow(0 0 10px var(--gold));
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* The Three Vessels */
+.karma-vessels {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 24px;
+    background: var(--bg-glass);
+    border: 1px solid var(--border-glass);
+    border-radius: 24px;
+    box-shadow: var(--shadow-glass);
+}
+
+.vessel {
+    width: 160px;
+    padding: 12px;
+    border-radius: 16px;
+    border: 2px solid var(--gold);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.vessel:hover {
+    transform: scale(1.05);
+    border-color: var(--white);
+}
+
+.vessel-icon {
+    font-size: 32px;
+    z-index: 2;
+}
+
+.vessel-label {
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--gold);
+    z-index: 2;
+    margin-top: 4px;
+}
+
+.vessel-water {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(to top, rgba(126, 200, 160, 0.4), rgba(126, 200, 160, 0.1));
+    z-index: 1;
+}
+
+#vesselSanchita .vessel-water { height: 80%; }
+#vesselPrarabdha .vessel-water { height: 40%; }
+#vesselAgami .vessel-water { height: 0%; transition: height 0.5s ease; }
+
+.vessel-arrow, .vessel-drop {
+    font-size: 24px;
+    color: var(--gold);
+    animation: bounce 2s infinite;
+}
+
+.vessel-drop {
+    opacity: 0;
+    animation: drip 3s infinite;
+}
+
+@keyframes drip {
+    0% { transform: translateY(-10px); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translateY(20px); opacity: 0; }
+}
+
+/* Sorting Game */
+.sorting-game {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    align-items: center;
+    width: 100%;
+    max-width: 600px;
+}
+
+.sorting-card-container {
+    height: 140px;
+    width: 100%;
+    perspective: 1000px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sorting-card {
+    width: 80%;
+    padding: 32px 24px;
+    background: linear-gradient(135deg, var(--bg-glass), var(--bg-glass-hover));
+    border: 1px solid var(--gold);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    text-align: center;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--white);
+    transition: all 0.4s var(--ease-spring);
+}
+
+.sorting-card.swipe-left {
+    transform: translateX(-150px) rotate(-15deg);
+    opacity: 0;
+}
+
+.sorting-card.swipe-right {
+    transform: translateX(150px) rotate(15deg);
+    opacity: 0;
+}
+
+.sorting-actions {
+    display: flex;
+    gap: 24px;
+    width: 100%;
+    justify-content: center;
+}
+
+.sort-btn {
+    padding: 16px 32px;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-glass);
+}
+
+.sort-btn.binding {
+    background: rgba(232, 108, 90, 0.2);
+    color: var(--rajas);
+    border: 1px solid var(--rajas);
+}
+
+.sort-btn.binding:hover {
+    background: var(--rajas);
+    color: var(--btn-text);
+}
+
+.sort-btn.liberating {
+    background: rgba(126, 200, 160, 0.2);
+    color: var(--sattva);
+    border: 1px solid var(--sattva);
+}
+
+.sort-btn.liberating:hover {
+    background: var(--sattva);
+    color: var(--btn-text);
+}
+
+.sorting-progress {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-top: 16px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
 
 /* ============================================

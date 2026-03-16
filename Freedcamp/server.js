@@ -19,6 +19,7 @@ const url = require('url');
 const PORT = process.env.PORT || 3456;
 const API_KEY    = 'e73ea921952c4777e10be30ec793968f4b61fc08';
 const API_SECRET = '0dac4c7f5ea5018bdfbfcc4678b3b83b16166dee';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyBkjmxRmcygJaaC2kyiHc7MvW-Al3fauFE';
 
 const FREEDCAMP_BASE = 'https://freedcamp.com/api/v1';
 
@@ -108,6 +109,49 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Gemini API Proxy (POST)
+  if (pathname === '/api/gemini' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const { prompt } = JSON.parse(body);
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+        const payload = JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.7, maxOutputTokens: 512 }
+        });
+
+        const reqOpts = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        };
+
+        const geminiReq = https.request(geminiUrl, reqOpts, (apiRes) => {
+          let resBody = '';
+          apiRes.on('data', chunk => resBody += chunk);
+          apiRes.on('end', () => {
+            res.writeHead(apiRes.statusCode, {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+            });
+            res.end(resBody);
+          });
+        });
+        geminiReq.on('error', (err) => {
+          res.writeHead(502, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: err.message }));
+        });
+        geminiReq.write(payload);
+        geminiReq.end();
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Invalid request body' }));
+      }
+    });
+    return;
+  }
+
   if (pathname.startsWith('/api/v1/')) {
     const apiPath = pathname.replace('/api/v1', '');
     proxyFreedcamp(apiPath, parsed.query, res);
@@ -115,7 +159,7 @@ const server = http.createServer((req, res) => {
   }
 
   // Named HTML routes
-  const htmlRoutes = { '/': 'index.html', '/team': 'team.html' };
+  const htmlRoutes = { '/': 'index.html', '/team': 'team.html', '/tasks': 'tasks.html' };
   const htmlFile = htmlRoutes[pathname];
   const filePath = htmlFile
     ? path.join(__dirname, htmlFile)

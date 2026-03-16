@@ -114,6 +114,24 @@ body::after  { width:700px;height:700px;bottom:-250px;right:-200px;
 }
 .nav-btn:hover { background: rgba(78,158,255,.18); border-color: rgba(78,158,255,.5); }
 
+/* Project Filter */
+.project-filter-wrap { display: flex; gap: 8px; align-items: center; }
+.project-select {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  color: var(--txt);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.78rem;
+  outline: none;
+  cursor: pointer;
+  transition: border-color var(--t), background var(--t);
+  max-width: 200px;
+}
+.project-select:hover { border-color: var(--border-h); background: var(--glass-b); }
+.project-select option { background: #0f172a; color: #fff; }
+
 /* ── Layout ──────────────────────────────────────────────────────────────── */
 .ceo-layout {
   position: relative; z-index: 1;
@@ -132,7 +150,10 @@ body::after  { width:700px;height:700px;bottom:-250px;right:-200px;
   min-width: 220px; padding: 28px 24px;
   display: flex; flex-direction: column; align-items: center; gap: 12px;
   text-align: center;
+  cursor: pointer;
+  transition: transform var(--t), border-color var(--t);
 }
+.health-card:hover { transform: scale(1.02); border-color: rgba(78,158,255,0.3); }
 .health-card::before {
   content: ''; position: absolute; inset: 0; border-radius: var(--r2);
   background: linear-gradient(145deg, rgba(78,158,255,.05), transparent);
@@ -159,9 +180,10 @@ body::after  { width:700px;height:700px;bottom:-250px;right:-200px;
 .kpi-card {
   padding: 20px 22px;
   display: flex; flex-direction: column; gap: 4px;
-  transition: transform var(--t), box-shadow var(--t);
+  transition: transform var(--t), box-shadow var(--t), background var(--t);
+  cursor: pointer;
 }
-.kpi-card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,.4); }
+.kpi-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,.5); background: rgba(255,255,255,0.06); }
 .kpi-card::before { content:''; position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--r2) var(--r2) 0 0; }
 .kpi-card.blue::before   { background:linear-gradient(90deg,var(--blue),transparent); }
 .kpi-card.green::before  { background:linear-gradient(90deg,var(--green),transparent); }
@@ -263,14 +285,16 @@ body::after  { width:700px;height:700px;bottom:-250px;right:-200px;
 .sc-stat-val { font-size: 1.25rem; font-weight: 800; line-height: 1; }
 .sc-stat-lbl { font-size: .6rem; color: var(--txt3); text-transform: uppercase; letter-spacing: .05em; text-align: center; }
 
-/* ── Alert Cards (unassigned / no due date) ───────────────────────────────── */
 .alert-card {
   border-radius: 14px; padding: 14px 18px;
   display: flex; align-items: center; gap: 14px;
   border: 1px dashed;
   background: var(--glass);
   flex-shrink: 0;
+  cursor: pointer;
+  transition: border-color var(--t), background var(--t);
 }
+.alert-card:hover { border-color: var(--border-h) !important; background: var(--glass-b); }
 .alert-card.warn-unassigned { border-color: rgba(167,139,250,.3); }
 .alert-card.warn-nodue      { border-color: rgba(255,183,64,.3); }
 .alert-icon { font-size: 1.4rem; flex-shrink: 0; }
@@ -297,6 +321,38 @@ body::after  { width:700px;height:700px;bottom:-250px;right:-200px;
 .pill:hover        { border-color: var(--border-h); color: var(--txt); }
 .pill.active       { background: rgba(78,158,255,.15); border-color: var(--blue); color: var(--blue); }
 
+/* Tabs */
+.dashboard-tabs { display: flex; gap: 8px; }
+.tab-btn {
+  background: none; border: none;
+  color: var(--txt2); font-size: 0.95rem; font-weight: 700;
+  padding: 4px 0; cursor: pointer;
+  position: relative; transition: color var(--t);
+  white-space: nowrap;
+}
+.tab-btn:hover { color: var(--txt); }
+.tab-btn.active { color: var(--blue); }
+.tab-btn.active::after {
+  content: ''; position: absolute; bottom: -4px; left: 0; right: 0;
+  height: 2px; background: var(--blue); border-radius: 2px;
+}
+
+/* Task Analysis Bar */
+.task-analysis-bar {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  margin-bottom: 16px;
+}
+.task-stat-mini {
+  padding: 12px 14px; border-radius: 12px;
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.ts-val { font-size: 1.1rem; font-weight: 800; }
+.ts-lbl { font-size: 0.6rem; color: var(--txt3); text-transform: uppercase; letter-spacing: 0.05em; }
+
+.tab-view { display: none; width: 100%; }
+.tab-view.active { display: block; }
+
 .ms-cards-wrap {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -322,7 +378,18 @@ body::after  { width:700px;height:700px;bottom:-250px;right:-200px;
 .ms-card-name    { font-size: .85rem; font-weight: 600; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ms-days-label   { font-size: .68rem; font-weight: 600; color: var(--blue);
   background: rgba(78,158,255,.12); padding: 2px 8px; border-radius: 10px; white-space: nowrap; flex-shrink: 0; }
-.ms-days-label.red { color: var(--red); background: rgba(255,94,126,.12); }
+.ms-days-label.red { color: var(--red); background: rgba(255,94,126,0.12); }
+
+.ms-card-mid { display: flex; flex-direction: column; gap: 8px; margin: 4px 0; }
+.ms-progress-bar { height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
+.ms-progress-fill { height: 100%; border-radius: 10px; transition: width 0.6s ease; }
+.ms-progress-fill.status-completed   { background: var(--green); }
+.ms-progress-fill.status-in-progress { background: var(--blue); }
+.ms-progress-fill.status-overdue     { background: var(--red); }
+
+.ms-progress-meta { display: flex; justify-content: space-between; align-items: center; }
+.ms-progress-pct { font-size: 0.65rem; font-weight: 600; color: var(--txt2); }
+.ms-task-count   { font-size: 0.65rem; color: var(--txt3); }
 
 .ms-card-bot { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .ms-project-tag { font-size: .68rem; color: var(--txt2); background: rgba(255,255,255,.05);
@@ -404,6 +471,12 @@ body::after  { width:700px;height:700px;bottom:-250px;right:-200px;
 .tag-inprogress { background: rgba(78,158,255,0.12); color: var(--blue); }
 .tag-notstarted { background: rgba(255,255,255,0.05); color: var(--txt3); }
 .tag-proj { background: rgba(255,255,255,0.05); color: var(--txt2); border: 1px solid var(--border); }
+
+/* Priority Tags */
+.tag-high { background: rgba(255,94,126,0.15); color: var(--red); border: 1px solid rgba(255,94,126,0.2) !important; }
+.tag-medium { background: rgba(255,183,64,0.15); color: var(--orange); border: 1px solid rgba(255,183,64,0.2) !important; }
+.tag-low { background: rgba(78,158,255,0.15); color: var(--blue); border: 1px solid rgba(78,158,255,0.2) !important; }
+.tag-no-priority { background: rgba(255,255,255,0.05); color: var(--txt3); }
 
 .dt-link { color: var(--txt3); font-size: .9rem; opacity: .4; transition: opacity .2s; }
 .dt-row:hover .dt-link { opacity: 1; }

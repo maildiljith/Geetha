@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task Command Center — Freedcamp</title>
+  <meta name="description" content="AI-powered task management and priority alerts for Freedcamp projects." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="tasks.css" />
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="auth.js"></script>
+</head>
+<body class="tasks-body">
+
+  <!-- Loading -->
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <span class="spinner-label">Loading task intelligence…</span>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="brand">
+      <a href="/" class="back-btn">← Overview</a>
+      <div class="brand-logo">FC</div>
+      <div>
+        <div class="brand-title">Task Command Center</div>
+        <div class="brand-sub" id="last-updated">Loading…</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="date-chip" id="date-chip"></div>
+      <div class="project-filter-wrap">
+        <select id="area-select" class="project-select">
+          <option value="all">All Areas</option>
+        </select>
+        <select id="project-select" class="project-select">
+          <option value="all">All Projects</option>
+        </select>
+      </div>
+      <!-- Notification Bell -->
+      <button class="notif-bell" id="notif-bell" title="Notifications">
+        🔔
+        <span class="notif-badge" id="notif-badge">0</span>
+      </button>
+      <button class="refresh-btn" id="refresh-btn">⟳ Refresh</button>
+      <button class="refresh-btn" onclick="logout()" style="background: rgba(255,94,126,0.1); border-color: rgba(255,94,126,0.2); color: #ff5e7e;">Logout</button>
+    </div>
+  </header>
+
+  <!-- Notification Dropdown -->
+  <div class="notif-overlay" id="notif-overlay"></div>
+  <aside class="notif-panel" id="notif-panel">
+    <div class="notif-panel-header">
+      <span class="notif-panel-title">🎯 Alerts <span class="ai-badge">✨ Gemini</span></span>
+      <div class="notif-panel-actions">
+        <button class="alerts-reset" id="reset-alerts-btn" title="Reset dismissed">↻ Reset</button>
+        <button class="notif-close" id="notif-close">✕</button>
+      </div>
+    </div>
+    <div class="notif-list" id="notif-list">
+      <!-- Rendered by JS -->
+    </div>
+  </aside>
+
+  <!-- Error -->
+  <div id="error-banner"></div>
+
+  <main class="tasks-layout">
+
+    <!-- ── AI Insight Banner ── -->
+    <div class="ai-insight-banner" id="ai-insight-banner">
+      <!-- Rendered by JS -->
+    </div>
+
+    <!-- ── Stats Bar ── -->
+    <section class="task-stats-bar" id="task-stats-bar">
+      <!-- Rendered by JS -->
+    </section>
+
+    <!-- ── Filters ── -->
+    <section class="task-filters-bar">
+      <input type="text" class="task-search" id="task-search" placeholder="🔍 Search tasks by name, assignee, or project…" />
+      <div class="priority-pills" id="priority-pills">
+        <button class="prio-pill active" data-prio="all">All</button>
+        <button class="prio-pill" data-prio="high">High</button>
+        <button class="prio-pill" data-prio="medium">Medium</button>
+        <button class="prio-pill" data-prio="low">Low</button>
+      </div>
+    </section>
+
+    <!-- ── Task Table ── -->
+    <section class="task-table-wrap">
+      <table class="task-table">
+        <thead>
+          <tr>
+            <th data-col="priority" class="sorted">Priority</th>
+            <th data-col="title">Task</th>
+            <th data-col="project">Project</th>
+            <th data-col="assignee">Assignee</th>
+            <th data-col="due">Due Date</th>
+            <th data-col="status">Status</th>
+          </tr>
+        </thead>
+        <tbody id="task-table-body">
+          <!-- Rendered by JS -->
+        </tbody>
+      </table>
+      <div class="task-pagination" id="task-pagination">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <script src="api.js"></script>
+  <script src="tasks.js"></script>
+</body>
+</html>

@@ -7,6 +7,9 @@ const api = new FreedcampAPI(API_KEY);
 let charts = {};
 let state = { projects: [], milestones: [], tasks: [], users: [] };
 let msFilter = 'all';
+let selectedArea = 'all';
+let selectedProjectId = 'all';
+let activeTab = 'milestones';
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
 
@@ -48,6 +51,32 @@ const avatarColor = name => {
 
 const initials = name => name.split(' ').map(w => w[0] || '').join('').toUpperCase().slice(0, 2) || '?';
 
+/**
+ * Returns a filtered subset of the state based on current dropdown selections.
+ */
+function getActiveData() {
+  let projects = state.projects;
+  
+  // Filter by Area (group_name)
+  if (selectedArea !== 'all') {
+    projects = projects.filter(p => p.group_name === selectedArea);
+  }
+  
+  // Filter by Project ID
+  if (selectedProjectId !== 'all') {
+    projects = projects.filter(p => String(p.id) === String(selectedProjectId));
+  }
+  
+  const pIds = new Set(projects.map(p => String(p.id)));
+  
+  return {
+    projects,
+    milestones: state.milestones.filter(m => pIds.has(String(m.project_id))),
+    tasks: state.tasks.filter(t => pIds.has(String(t.project_id))),
+    users: state.users
+  };
+}
+
 // ── Health Score ──────────────────────────────────────────────────────────────
 
 function computeHealth(ms, tasks) {
@@ -73,13 +102,15 @@ function gradeFromScore(s) {
 }
 
 function renderHealth() {
-  const score = computeHealth(state.milestones, state.tasks);
+  const { milestones, tasks } = getActiveData();
+  const score = computeHealth(milestones, tasks);
   const { grade, color } = gradeFromScore(score);
   document.getElementById('health-score').textContent = score;
   document.getElementById('health-grade').textContent = grade;
   document.getElementById('health-grade').style.color = color;
 
-  const overdueMs = state.milestones.filter(m => getMsStatus(m) === 'overdue').length;
+  document.getElementById('health-grade').style.color = color;
+  const overdueMs = milestones.filter(m => getMsStatus(m) === 'overdue').length;
   document.getElementById('health-meta').innerHTML =
     overdueMs > 0
       ? `<span style="color:#ff5e7e">⚠ ${overdueMs} overdue milestone${overdueMs>1?'s':''}</span>`
@@ -102,8 +133,9 @@ function renderHealth() {
 // ── KPIs ──────────────────────────────────────────────────────────────────────
 
 function renderKPIs() {
-  const ms = state.milestones;
-  const t  = state.tasks;
+  const { projects, milestones, tasks, users } = getActiveData();
+  const ms = milestones;
+  const t  = tasks;
   const done  = ms.filter(m => getMsStatus(m) === 'completed').length;
   const over  = ms.filter(m => getMsStatus(m) === 'overdue').length;
 
@@ -112,19 +144,20 @@ function renderKPIs() {
   const overdueTasks = activeTasks.filter(x => x.due_ts && +x.due_ts * 1000 < Date.now());
   const memberIds    = new Set(activeTasks.map(x => x.assigned_to_id).filter(Boolean));
 
-  document.getElementById('k-projects').textContent    = state.projects.length;
+  document.getElementById('k-projects').textContent    = projects.length;
   document.getElementById('k-milestones').textContent  = ms.length;
   document.getElementById('k-ms-done').textContent     = `${done} / ${ms.length}`;
   document.getElementById('k-overdue').textContent     = over;
   document.getElementById('k-tasks-pct').textContent   = activeTasks.length;
   document.getElementById('k-tasks-sub').textContent   = `${overdueTasks.length} overdue`;
-  document.getElementById('k-members').textContent     = memberIds.size || state.users.length;
+  document.getElementById('k-members').textContent     = memberIds.size || users.length;
 }
 
 // ── Milestone Doughnut ────────────────────────────────────────────────────────
 
 function renderMilestoneChart() {
-  const ms = state.milestones;
+  const { milestones } = getActiveData();
+  const ms = milestones;
   const done = ms.filter(m => getMsStatus(m) === 'completed').length;
   const over = ms.filter(m => getMsStatus(m) === 'overdue').length;
   const prog = ms.filter(m => getMsStatus(m) === 'in-progress').length;
@@ -162,7 +195,8 @@ function renderLeaderboard() {
   const nameCache = {};
   const map = {};
 
-  state.tasks.forEach(t => {
+  const { tasks: filteredTasks } = getActiveData();
+  filteredTasks.forEach(t => {
     const uid  = t.assigned_to_id || '__none__';
     const name = t.assigned_to_fullname || '';
     if (uid !== '__none__' && name && !nameCache[uid]) nameCache[uid] = name;
@@ -202,13 +236,15 @@ function renderLeaderboard() {
   board.innerHTML = '';
 
   // ── Alert: Unassigned active tasks ──────────────────────────────────────────
-  const unassigned = state.tasks.filter(t =>
+  const unassigned = filteredTasks.filter(t =>
     t.status != 1 && t.progress != 100 && !t.assigned_to_id
   );
   if (unassigned.length > 0) {
     const names = [...new Set(unassigned.map(t => t.title || 'Untitled'))].slice(0, 3);
     const el = document.createElement('div');
     el.className = 'alert-card warn-unassigned';
+    el.style.cursor = 'pointer';
+    el.onclick = () => openDetailDrawer('Unassigned Tasks', 'Action required: Assign team members', unassigned, 'tasks');
     el.innerHTML = `
       <div class="alert-icon">👤</div>
       <div class="alert-info">
@@ -220,14 +256,15 @@ function renderLeaderboard() {
     board.appendChild(el);
   }
 
-  // ── Alert: Active tasks with no due date ────────────────────────────────────
-  const noDueDate = state.tasks.filter(t =>
+  const noDueDate = filteredTasks.filter(t =>
     t.status != 1 && t.progress != 100 && !t.due_ts
   );
   if (noDueDate.length > 0) {
     const names = [...new Set(noDueDate.map(t => t.title || 'Untitled'))].slice(0, 3);
     const el = document.createElement('div');
     el.className = 'alert-card warn-nodue';
+    el.style.cursor = 'pointer';
+    el.onclick = () => openDetailDrawer('Tasks with No Due Date', 'Requires immediate scheduling', noDueDate, 'tasks');
     el.innerHTML = `
       <div class="alert-icon">📅</div>
       <div class="alert-info">
@@ -247,6 +284,8 @@ function renderLeaderboard() {
 
     const card = document.createElement('div');
     card.className = `sc-card urgency-${urgency}`;
+    card.style.cursor = 'pointer';
+    card.onclick = () => openDetailDrawer(`${name}'s Active Tasks`, `${m.active} tasks across all projects`, m.activeTasks, 'tasks');
     card.innerHTML = `
       <div class="sc-header">
         <div class="sc-avatar" style="background:${color}">${initials(name)}</div>
@@ -287,47 +326,88 @@ function renderLeaderboard() {
 
 // ── Milestone Cards ───────────────────────────────────────────────────────────
 
-// ── Milestone Modal ──
-function openMilestoneDrawer(ms) {
-  const status = getMsStatus(ms);
-  const tasks = state.tasks.filter(t => t.ms_id == ms.id);
-  const doneTasks = tasks.filter(t => t.status == 1 || t.progress == 100);
-
-  document.getElementById('ms-modal-title').textContent = ms.title || ms.name || 'Untitled';
-  document.getElementById('ms-modal-project').textContent = projectName(ms.project_id);
-  document.getElementById('ms-modal-tasks-total').textContent = tasks.length;
-  document.getElementById('ms-modal-tasks-done').textContent = doneTasks.length;
-  document.getElementById('ms-modal-due').textContent = formatDate(ms.due_date);
-  document.getElementById('ms-modal-status').textContent = status.toUpperCase();
-  document.getElementById('ms-modal-status').style.color = status === 'completed' ? '#00e5a0' : status === 'overdue' ? '#ff5e7e' : '#4e9eff';
+// ── Detail Drawer (Universal) ──
+function openDetailDrawer(title, subtitle, data, type = 'tasks') {
+  document.getElementById('ms-modal-title').textContent = title;
+  document.getElementById('ms-modal-project').textContent = subtitle;
+  
+  // Update icons or metadata if needed
+  const iconEl = document.getElementById('ms-modal-icon');
+  iconEl.textContent = type === 'projects' ? '🗂' : type === 'milestones' ? '🏁' : '📋';
 
   const listEl = document.getElementById('ms-modal-tasks-list');
   listEl.innerHTML = '';
 
-  if (tasks.length === 0) {
-    listEl.innerHTML = '<div class="empty-state">No tasks linked to this milestone.</div>';
-  } else {
-    tasks.forEach(t => {
-      const isDone = t.status == 1 || t.progress == 100;
-      const isProgress = t.status == 2;
-      const tStatus = isDone ? 'Done' : isProgress ? 'In Progress' : 'Not Started';
-      const tClass = isDone ? 'tag-done' : isProgress ? 'tag-inprogress' : 'tag-notstarted';
-      const fcUrl = t.url || `https://freedcamp.com/view/${t.project_id}/tasks/${t.id}`;
+  const totalVal = document.getElementById('ms-modal-tasks-total');
+  const doneVal = document.getElementById('ms-modal-tasks-done');
+  const dueVal = document.getElementById('ms-modal-due');
+  const statusVal = document.getElementById('ms-modal-status');
 
+  // Reset standard modal fields
+  totalVal.textContent = '—';
+  doneVal.textContent = '—';
+  dueVal.textContent = '—';
+  statusVal.textContent = '—';
+
+  if (!data || data.length === 0) {
+    listEl.innerHTML = '<div class="empty-state">No items found.</div>';
+  } else {
+    data.forEach(item => {
       const row = document.createElement('a');
       row.className = 'dt-row';
-      row.href = fcUrl;
-      row.target = '_blank';
-      row.innerHTML = `
-        <div class="dt-main">
-          <span class="dt-title">${t.title || 'Untitled'}</span>
-          <div class="dt-tags">
-            <span class="dt-tag ${tClass}">${tStatus}</span>
-            ${t.assigned_to_fullname ? `<span class="dt-tag tag-proj">${t.assigned_to_fullname}</span>` : ''}
+      row.style.cursor = 'pointer';
+
+      if (type === 'projects') {
+        const id = item.id || item.project_id;
+        row.href = `https://freedcamp.com/view/${id}/tasks/`;
+        row.target = '_blank';
+        row.innerHTML = `
+          <div class="dt-main">
+            <span class="dt-title">${item.project_name || item.title || 'Untitled Project'}</span>
+            <div class="dt-tags">
+              <span class="dt-tag tag-proj">Project ID: ${id}</span>
+            </div>
           </div>
-        </div>
-        <div class="dt-link">↗</div>
-      `;
+          <div class="dt-link">↗</div>
+        `;
+      } else if (type === 'milestones') {
+        const status = getMsStatus(item);
+        row.onclick = (e) => {
+          e.preventDefault();
+          openMilestoneDrawer(item);
+        };
+        row.innerHTML = `
+          <div class="dt-main">
+            <span class="dt-title">${item.title || item.name || 'Untitled Milestone'}</span>
+            <div class="dt-tags">
+              <span class="dt-tag ${status === 'completed' ? 'tag-done' : status === 'overdue' ? 'tag-notstarted' : 'tag-inprogress'}">${status.toUpperCase()}</span>
+              <span class="dt-tag tag-proj">${projectName(item.project_id)}</span>
+            </div>
+          </div>
+          <div class="dt-link">👁</div>
+        `;
+      } else {
+        // Default: tasks
+        const isDone = item.status == 1 || item.progress == 100;
+        const isProgress = item.status == 2;
+        const tStatus = isDone ? 'Done' : isProgress ? 'In Progress' : 'Not Started';
+        const tClass = isDone ? 'tag-done' : isProgress ? 'tag-inprogress' : 'tag-notstarted';
+        const fcUrl = item.url || `https://freedcamp.com/view/${item.project_id}/tasks/${item.id}`;
+        
+        row.href = fcUrl;
+        row.target = '_blank';
+        row.innerHTML = `
+          <div class="dt-main">
+            <span class="dt-title">${item.title || 'Untitled Task'}</span>
+            <div class="dt-tags">
+              <span class="dt-tag ${tClass}">${tStatus}</span>
+              <span class="dt-tag tag-proj">${projectName(item.project_id)}</span>
+              ${item.assigned_to_fullname ? `<span class="dt-tag tag-proj">${item.assigned_to_fullname}</span>` : ''}
+            </div>
+          </div>
+          <div class="dt-link">↗</div>
+        `;
+      }
       listEl.appendChild(row);
     });
   }
@@ -344,10 +424,13 @@ function closeMilestoneDrawer() {
 }
 
 function renderMilestoneCards() {
+  const { milestones } = getActiveData();
   const wrap = document.getElementById('ms-cards-wrap');
   wrap.innerHTML = '';
 
-  let ms = msFilter === 'all' ? state.milestones : state.milestones.filter(m => getMsStatus(m) === msFilter);
+  let ms = milestones;
+  if (msFilter !== 'all') ms = ms.filter(m => getMsStatus(m) === msFilter);
+
   // Sort: overdue first, then by due date, then by name
   ms = [...ms].sort((a, b) => {
     const sa = getMsStatus(a), sb = getMsStatus(b);
@@ -367,6 +450,13 @@ function renderMilestoneCards() {
     const proj    = m.project_id ? projectName(m.project_id) : '—';
     const days    = msDaysLeft(m.due_date);
     const dateStr = formatDate(m.due_date);
+    
+    // Calculate task progress for this milestone
+    const msTasks = state.tasks.filter(t => String(t.ms_id) === String(m.id));
+    const totalT  = msTasks.length;
+    const doneT   = msTasks.filter(t => t.status == 1 || t.progress == 100).length;
+    const pct     = totalT > 0 ? Math.round((doneT / totalT) * 100) : (status === 'completed' ? 100 : 0);
+
     let daysLabel = '';
     if (status === 'in-progress' && days !== null) {
       daysLabel = days > 0 ? `${days}d left` : 'Due today';
@@ -384,6 +474,15 @@ function renderMilestoneCards() {
         <span class="ms-card-name">${name}</span>
         ${daysLabel ? `<span class="ms-days-label ${status === 'overdue' ? 'red' : ''}">${daysLabel}</span>` : ''}
       </div>
+      <div class="ms-card-mid">
+        <div class="ms-progress-bar">
+          <div class="ms-progress-fill status-${status}" style="width: ${pct}%"></div>
+        </div>
+        <div class="ms-progress-meta">
+          <span class="ms-progress-pct">${pct}% Complete</span>
+          <span class="ms-task-count">${doneT}/${totalT} tasks</span>
+        </div>
+      </div>
       <div class="ms-card-bot">
         <span class="ms-project-tag">${proj}</span>
         <span class="ms-date-tag">${dateStr}</span>
@@ -391,6 +490,143 @@ function renderMilestoneCards() {
     `;
     card.addEventListener('click', () => openMilestoneDrawer(m));
     wrap.appendChild(card);
+  });
+}
+
+function renderTasksTab() {
+  const wrap = document.getElementById('tab-tasks-list');
+  const bar = document.getElementById('task-analysis-bar');
+  if (!wrap || !bar) return;
+  
+  wrap.innerHTML = '';
+  bar.innerHTML = '';
+
+  const { tasks: allActiveTasks } = getActiveData();
+  let tasks = allActiveTasks.filter(t => t.status != 1 && t.progress != 100); 
+
+  // ── Task Analysis Data ──
+  const now = Date.now();
+  const overdueCount = tasks.filter(t => t.due_ts && (+t.due_ts * 1000) < now).length;
+  const highPriority = tasks.filter(t => (t.priority_title || '').toLowerCase() === 'high').length;
+  const dueSoon = tasks.filter(t => {
+    if (!t.due_ts) return false;
+    const diff = (+t.due_ts * 1000 - now) / 86400000;
+    return diff >= 0 && diff <= 3;
+  }).length;
+
+  // Render Analysis Bar
+  const stats = [
+    { label: 'Active Tasks', val: tasks.length, color: 'var(--txt)' },
+    { label: 'High Priority', val: highPriority, color: 'var(--red)' },
+    { label: 'Overdue', val: overdueCount, color: 'var(--red)' },
+    { label: 'Due Soon (3d)', val: dueSoon, color: 'var(--blue)' }
+  ];
+  
+  stats.forEach(s => {
+    const card = document.createElement('div');
+    card.className = 'task-stat-mini';
+    card.innerHTML = `
+      <span class="ts-val" style="color:${s.color}">${s.val}</span>
+      <span class="ts-lbl">${s.label}</span>
+    `;
+    bar.appendChild(card);
+  });
+
+  if (tasks.length === 0) {
+    wrap.innerHTML = '<div class="empty-state">No active tasks found for the selected project.</div>';
+    return;
+  }
+
+  // Sort tasks: Priority (High -> Med -> Low), then Due Date
+  const prioMap = { 'high': 0, 'medium': 1, 'low': 2, 'none': 3, '': 3 };
+  tasks.sort((a, b) => {
+    const pa = prioMap[(a.priority_title || '').toLowerCase()] ?? 3;
+    const pb = prioMap[(b.priority_title || '').toLowerCase()] ?? 3;
+    if (pa !== pb) return pa - pb;
+    return (a.due_ts || Infinity) - (b.due_ts || Infinity);
+  });
+
+  tasks.forEach(item => {
+    const isDone = item.status == 1 || item.progress == 100;
+    const isProgress = item.status == 2;
+    const tStatus = isDone ? 'Done' : isProgress ? 'In Progress' : 'Not Started';
+    const tClass = isDone ? 'tag-done' : isProgress ? 'tag-inprogress' : 'tag-notstarted';
+    
+    // Priority Tag
+    const prio = (item.priority_title || '').toLowerCase();
+    const prioClass = prio === 'high' ? 'tag-high' : prio === 'medium' ? 'tag-medium' : prio === 'low' ? 'tag-low' : 'tag-no-priority';
+    
+    // Date Analysis
+    let dateInfo = '';
+    if (item.due_ts) {
+      const days = Math.ceil((+item.due_ts * 1000 - now) / 86400000);
+      if (days < 0) dateInfo = `<span style="color:var(--red); font-weight:700;">⚠ ${Math.abs(days)}d Overdue</span>`;
+      else if (days === 0) dateInfo = `<span style="color:var(--blue); font-weight:700;">Due Today</span>`;
+      else dateInfo = `<span style="color:var(--txt3)">Due in ${days}d</span>`;
+    }
+
+    const fcUrl = item.url || `https://freedcamp.com/view/${item.project_id}/tasks/${item.id}`;
+    
+    const row = document.createElement('a');
+    row.className = 'dt-row';
+    row.href = fcUrl;
+    row.target = '_blank';
+    row.innerHTML = `
+      <div class="dt-main">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <span class="dt-title">${item.title || 'Untitled Task'}</span>
+          <div style="font-size:0.65rem; text-align:right;">${dateInfo}</div>
+        </div>
+        <div class="dt-tags">
+          <span class="dt-tag ${prioClass}">${item.priority_title || 'No Priority'}</span>
+          <span class="dt-tag ${tClass}">${tStatus}</span>
+          <span class="dt-tag tag-proj">${projectName(item.project_id)}</span>
+          ${item.assigned_to_fullname ? `<span class="dt-tag tag-proj">👤 ${item.assigned_to_fullname}</span>` : ''}
+          ${item.task_group_name ? `<span class="dt-tag tag-proj">📁 ${item.task_group_name}</span>` : ''}
+        </div>
+      </div>
+      <div class="dt-link">↗</div>
+    `;
+    wrap.appendChild(row);
+  });
+}
+
+function renderAreaFilter() {
+  const select = document.getElementById('area-select');
+  if (!select) return;
+  
+  const groups = [...new Set(state.projects.map(p => p.group_name).filter(Boolean))].sort();
+  select.innerHTML = '<option value="all">All Areas</option>';
+  
+  groups.forEach(g => {
+    const opt = document.createElement('option');
+    opt.value = g;
+    opt.textContent = g;
+    if (g === selectedArea) opt.selected = true;
+    select.appendChild(opt);
+  });
+}
+
+function renderProjectFilter() {
+  const select = document.getElementById('project-select');
+  if (!select) return;
+  
+  // Filter projects by Area first
+  let projects = state.projects;
+  if (selectedArea !== 'all') {
+    projects = projects.filter(p => p.group_name === selectedArea);
+  }
+  // Deduplicate by project ID
+  const seen = new Set();
+  projects = projects.filter(p => { const k = String(p.id); if (seen.has(k)) return false; seen.add(k); return true; });
+
+  select.innerHTML = '<option value="all">All Projects</option>';
+  projects.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.id;
+    opt.textContent = p.project_name || p.title || 'Untitled Project';
+    if (String(p.id) === String(selectedProjectId)) opt.selected = true;
+    select.appendChild(opt);
   });
 }
 
@@ -411,7 +647,10 @@ async function loadData() {
     renderKPIs();
     renderMilestoneChart();
     renderLeaderboard();
+    renderAreaFilter();
+    renderProjectFilter();
     renderMilestoneCards();
+    renderTasksTab();
     const now = new Date();
     document.getElementById('last-updated').textContent =
       `Last updated ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
@@ -429,6 +668,31 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('modal-overlay').onclick = closeMilestoneDrawer;
   document.addEventListener('keydown', e => { if (e.key==='Escape') closeMilestoneDrawer(); });
 
+  // KPI Click Handlers
+  document.getElementById('kpi-projects').onclick = () => openDetailDrawer('Project Inventory', 'All projects in Freedcamp', state.projects, 'projects');
+  document.getElementById('kpi-milestones').onclick = () => openDetailDrawer('Milestones', 'All milestones across projects', state.milestones, 'milestones');
+  document.getElementById('kpi-ms-done').onclick = () => {
+    const done = state.milestones.filter(m => getMsStatus(m) === 'completed');
+    openDetailDrawer('Completed Milestones', 'Archive of successful deliveries', done, 'milestones');
+  };
+  document.getElementById('kpi-overdue').onclick = () => {
+    const over = state.milestones.filter(m => getMsStatus(m) === 'overdue');
+    openDetailDrawer('Overdue Milestones', 'Priority items requiring attention', over, 'milestones');
+  };
+  document.getElementById('kpi-tasks').onclick = () => {
+    const active = state.tasks.filter(t => t.status != 1 && t.progress != 100);
+    openDetailDrawer('Live Tasks', 'Current active workload', active, 'tasks');
+  };
+  document.getElementById('kpi-members').onclick = () => {
+    // Show active members list? Or users list. Let's show users.
+    openDetailDrawer('Team Members', 'Organization members with active tasks', state.users, 'users');
+  };
+  document.getElementById('kpi-health').onclick = () => {
+    // Overall health summary: Show overdue vs pending?
+    const urgentTasks = state.tasks.filter(t => t.status != 1 && t.due_ts && +t.due_ts * 1000 < Date.now());
+    openDetailDrawer('Priority Health View', 'Tasks and milestones impacting current score', urgentTasks, 'tasks');
+  };
+
   // Milestone filter pills
   document.querySelectorAll('.pill').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -436,6 +700,53 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.classList.add('active');
       msFilter = btn.dataset.filter;
       renderMilestoneCards();
+    });
+  });
+
+  // Area Filter Change
+  const areaSelect = document.getElementById('area-select');
+  if (areaSelect) {
+    areaSelect.addEventListener('change', (e) => {
+      selectedArea = e.target.value;
+      selectedProjectId = 'all'; // Reset project when area changes
+      renderProjectFilter();
+      renderAll();
+    });
+  }
+
+  // Project Filter Change
+  const projSelect = document.getElementById('project-select');
+  if (projSelect) {
+    projSelect.addEventListener('change', (e) => {
+      selectedProjectId = e.target.value;
+      renderAll();
+    });
+  }
+
+  function renderAll() {
+    renderKPIs();
+    renderHealth();
+    renderMilestoneChart();
+    renderLeaderboard();
+    renderMilestoneCards();
+    renderTasksTab();
+  }
+
+  // Dashboard Tabs
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeTab = btn.dataset.tab;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+      document.getElementById(`${activeTab}-view`).classList.add('active');
+      
+      // Filter pills only show for milestones
+      document.getElementById('ms-filter-pills').style.display = activeTab === 'milestones' ? 'flex' : 'none';
+      
+      if (activeTab === 'milestones') renderMilestoneCards();
+      else renderTasksTab();
     });
   });
 

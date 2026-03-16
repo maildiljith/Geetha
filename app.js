@@ -272,7 +272,7 @@ function nextStage() {
 // ============================================
 
 // Check saved progress
-const savedProgress = parseInt(localStorage.getItem('mayaProgress') || '1');
+let savedProgress = parseInt(localStorage.getItem('mayaProgress') || '1');
 
 // Setup Chapter 1
 document.getElementById('startBtn').addEventListener('click', () => {
@@ -318,8 +318,8 @@ if (chapter2Btn) {
             showToast('Complete Chapter 1 to unlock Karma', '🔒');
             playWrongSound();
         } else {
-            showToast('Chapter 2: Karma is coming soon!', '🌟');
-            playCorrectSound();
+            ensureAudioCtx();
+            goToStage(10); // Start Chapter 2
         }
     });
 }
@@ -363,6 +363,14 @@ function triggerStageAnimation(n) {
         case 6: startQuiz('ego'); break;
         case 8: startQuiz('final'); break;
         case 9: showResults(); break;
+        
+        // Chapter 2: Karma
+        case 10: /* Wheel handled via CSS mostly, but trigger cards */ animateInsightCards(); break;
+        case 11: startQuiz('karma1'); break;
+        case 12: initKarmaVessels(); break;
+        case 13: initSortingGame(); break;
+        case 14: startQuiz('karmaFinal'); break;
+        case 15: showResults2(); break;
     }
 }
 
@@ -594,19 +602,30 @@ const TIMER_CIRC = 2 * Math.PI * 34;
 
 // Question pools
 const treeQuestions = [
-    { question: "In the Bhagavad Gita, how is Maya described metaphorically?", options: ["As a vast ocean", "As an upside-down tree", "As a burning fire", "As a flowing river"], correct: 1, explanation: "Krishna describes Maya as an inverted banyan tree (Ashvattha) — roots above, branches below." },
-    { question: "What does 'Ashvattha' literally mean?", options: ["Eternal truth", "That which does not last till tomorrow", "The tree of knowledge", "The root of all evil"], correct: 1, explanation: "Ashvattha means 'that which does not last till tomorrow' — the material world is impermanent." },
+    { question: "In the Bhagavad Gita, how is Maya described metaphorically?", options: ["A labyrinth of endless desires", "An inverted banyan tree with roots above", "A mirrored hall reflecting the soul", "A golden vessel hiding the truth"], correct: 1, explanation: "Krishna describes Maya as an inverted banyan tree (Ashvattha) — roots above, branches below." },
+    { question: "What does 'Ashvattha' literally mean?", options: ["The eternal tree of cosmic wisdom", "That which survives the end of time", "That which does not last till tomorrow", "The unbroken cycle of birth and death"], correct: 2, explanation: "Ashvattha means 'that which does not last till tomorrow' — the material world is impermanent." },
 ];
 
 const egoQuestions = [
-    { question: "What is 'Ahamkara' in the context of Maya?", options: ["The path to liberation", "The three qualities of nature", "The false sense of ego or 'I-ness'", "The cosmic tree of existence"], correct: 2, explanation: "Ahamkara is the ego — the false identification with the body that makes the soul believe it is the 'doer.'" },
-    { question: "What does the soul falsely identify with under Maya?", options: ["Other souls", "The body, mind, and intellect", "The cosmos", "Divine beings"], correct: 1, explanation: "Under Maya, the soul falsely identifies with the body, mind, and intellect — 'I am this body.'" },
+    { question: "What is 'Ahamkara' in the context of Maya?", options: ["The subtle life force within the body", "The divine will controlling the universe", "The illusion of independent 'I-ness'", "The ultimate state of pure consciousness"], correct: 2, explanation: "Ahamkara is the ego — the false identification with the body that makes the soul believe it is the 'doer.'" },
+    { question: "What does the soul falsely identify with under Maya?", options: ["Its eternal and unchanging spiritual nature", "The temporary body, mind, and intellect", "The collective consciousness of humanity", "The supreme reality underlying existence"], correct: 1, explanation: "Under Maya, the soul falsely identifies with the temporary body, mind, and intellect — 'I am this body.'" },
 ];
 
 const finalQuestions = [
-    { question: "Which Guna represents purity and goodness?", options: ["Tamas", "Rajas", "Sattva", "Dharma"], correct: 2, explanation: "Sattva represents goodness, purity, and harmony." },
-    { question: "What is Vairagya?", options: ["Attachment to results", "Detachment and non-attachment", "A type of meditation", "A sacred scripture"], correct: 1, explanation: "Vairagya means detachment — non-attachment to the fruits of actions." },
-    { question: "What is the ultimate way to transcend Maya?", options: ["More knowledge alone", "More rituals", "Knowledge, detachment & surrender", "Complete withdrawal"], correct: 2, explanation: "Freedom requires Jnana (knowledge), Vairagya (detachment), and Sharanagati (surrender to the Divine)." },
+    { question: "Which statement best describes the Guna of Sattva?", options: ["It is the driving force of worldly ambition", "It is the grounding force of physical stability", "It is the illuminating force of purity and harmony", "It is the universal law of ethical duty"], correct: 2, explanation: "Sattva represents goodness, purity, and harmony, illuminating the mind." },
+    { question: "What is the true essence of Vairagya?", options: ["The renunciation of all physical actions", "Radiant devotion to a supreme deity", "Objectivity without attachment to outcomes", "The complete suppression of natural desires"], correct: 2, explanation: "Vairagya means detachment — retaining objectivity and non-attachment to the fruits of actions, not suppressing them." },
+    { question: "What is the ultimate way to definitively transcend Maya?", options: ["Accumulating vast scriptural knowledge", "Strict adherence to physical austerities", "Integrating knowledge, detachment & surrender", "Retreating entirely from all worldly duties"], correct: 2, explanation: "Freedom requires a combination of Jnana (knowledge), Vairagya (detachment), and Sharanagati (surrender to the Divine)." },
+];
+
+const karma1Questions = [
+    { question: "What does the word 'Karma' literally translate to?", options: ["Destiny or fate", "Action or deed", "Universal suffering", "Divine retribution"], correct: 1, explanation: "Karma simply means 'action'. It is the universal principle of cause and effect." },
+    { question: "According to the law of Karma, who is responsible for your present reality?", options: ["The arbitrary will of the divine", "The luck you were born with", "Your own past actions", "The alignment of the stars"], correct: 2, explanation: "You are the architect of your destiny; your present reality is the harvest of your past actions." },
+];
+
+const karmaFinalQuestions = [
+    { question: "Which type of Karma refers to the vast, accumulated reservoir of past actions?", options: ["Prarabdha", "Agami", "Sanchita", "Nishkama"], correct: 2, explanation: "Sanchita Karma is the accumulated sum of all past actions from countless lifetimes." },
+    { question: "What is 'Prarabdha' Karma?", options: ["The karma you are creating right now", "The portion of past karma bearing fruit in this lifetime", "The karma that leads directly to liberation", "Actions performed without any selfish motive"], correct: 1, explanation: "Prarabdha is the karma chosen for this specific lifetime, dictating inevitable life situations." },
+    { question: "How does one generate 'Agami' Karma?", options: ["Through actions performed in past lives", "By passively experiencing the consequences of Prarabdha", "Through current choices and free will", "By abandoning all physical activities"], correct: 2, explanation: "Agami Karma is the new karma you are generating right now through your current choices." },
 ];
 
 // Game state
@@ -860,6 +879,17 @@ function showResults() {
         spawnConfetti(80);
         playStreakSound(totalScore);
         if (totalScore === total && total > 0) showToast('PERFECT! True enlightenment!', '🕉️');
+        
+        // Unlock Chapter 2 (Karma)
+        if (savedProgress < 2) {
+            savedProgress = 2;
+            localStorage.setItem('mayaProgress', '2');
+            updateChapterUI();
+        }
+        
+        // Show Continue to Karma button
+        const continueKarmaBtn = document.getElementById('continueKarmaBtn');
+        if(continueKarmaBtn) continueKarmaBtn.style.display = 'inline-block';
     }
 }
 
@@ -915,4 +945,195 @@ document.getElementById('retryBtn').addEventListener('click', () => {
     if (resultFill) resultFill.style.strokeDashoffset = 534;
 
     goToStage(0);
+});
+
+// ============================================
+// CHAPTER 2: KARMA LOGIC
+// ============================================
+
+// --- Karma Vessels Animation ---
+function initKarmaVessels() {
+    // Mostly CSS-driven hover, but wait 1s and trigger water drop
+    setTimeout(() => {
+        const drop = document.querySelector('.vessel-drop');
+        if(drop) drop.style.animation = 'drip 2s infinite';
+    }, 1000);
+}
+
+// --- Sorting Game ---
+const sortingScenarios = [
+    { text: "Donating to charity to look good on social media", type: "binding" },
+    { text: "Performing your duty without expecting a reward", type: "liberating" },
+    { text: "Helping a stranger sincerely out of compassion", type: "liberating" },
+    { text: "Working overtime purely for the bonus pay", type: "binding" }
+];
+let sortingIndex = 0;
+let sortingScore = 0;
+
+function initSortingGame() {
+    sortingIndex = 0;
+    sortingScore = 0;
+    
+    // reset UI buttons
+    document.querySelectorAll('.sort-btn').forEach(btn => btn.style.display = 'block');
+    
+    updateSortingCard();
+    document.getElementById('sortingProgress').textContent = `0/${sortingScenarios.length} Sorted`;
+    document.getElementById('sortingFeedback').textContent = '';
+    
+    // Add event listeners if not already added
+    if (!window.sortingListenerAdded) {
+        document.querySelectorAll('.sort-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => handleSort(e.target.dataset.type));
+        });
+        window.sortingListenerAdded = true;
+    }
+}
+
+function updateSortingCard() {
+    const card = document.getElementById('sortingCard');
+    const text = document.getElementById('sortingScenario');
+    
+    if (sortingIndex < sortingScenarios.length) {
+        card.className = 'sorting-card'; // reset classes
+        text.textContent = sortingScenarios[sortingIndex].text;
+    } else {
+        // Game over
+        card.className = 'sorting-card';
+        text.textContent = "Activity Complete!";
+        document.querySelectorAll('.sort-btn').forEach(btn => btn.style.display = 'none');
+        setTimeout(() => {
+            goToStage(14); // Go to final quiz
+        }, 2000);
+    }
+}
+
+function handleSort(selectedType) {
+    if (sortingIndex >= sortingScenarios.length) return;
+    
+    const current = sortingScenarios[sortingIndex];
+    const card = document.getElementById('sortingCard');
+    const fbk = document.getElementById('sortingFeedback');
+    
+    if (selectedType === current.type) {
+        // Correct
+        playCorrectSound();
+        sortingScore++;
+        card.classList.add(selectedType === 'binding' ? 'swipe-left' : 'swipe-right');
+        fbk.textContent = "Correct! +100";
+        fbk.className = "match-feedback correct";
+        updatePointsDisplay(100);
+        flashScreen('correct');
+    } else {
+        // Wrong
+        playWrongSound();
+        card.style.animation = 'shakeX 0.4s ease';
+        fbk.textContent = "Incorrect. " + (current.type === 'binding' ? "This creates karma due to selfie motives." : "This is Nishkama Karma, action without attachment.");
+        fbk.className = "match-feedback incorrect";
+        flashScreen('incorrect');
+        
+        setTimeout(() => {
+            card.style.animation = '';
+        }, 400);
+    }
+    
+    sortingIndex++;
+    document.getElementById('sortingProgress').textContent = `${sortingIndex}/${sortingScenarios.length} Sorted`;
+    
+    setTimeout(() => {
+        updateSortingCard();
+    }, 600);
+}
+
+// --- Results 2 ---
+function showResults2() {
+    const maxPossScore = karma1Questions.length + karmaFinalQuestions.length;
+    // We re-use current totalScore which resets on retry.
+    
+    const percentage = Math.min(100, Math.round((totalScore / maxPossScore) * 100));
+    const resultFill = document.getElementById('resultFill2');
+    const offset = 534 - (534 * percentage) / 100;
+    
+    setTimeout(() => {
+        if(resultFill) {
+            resultFill.style.transition = 'stroke-dashoffset 1.5s ease-out';
+            resultFill.style.strokeDashoffset = offset;
+        }
+    }, 500);
+
+    document.getElementById('resultScore2').textContent = `${totalScore}/${maxPossScore}`;
+    document.getElementById('statAccuracy2').textContent = `${percentage}%`;
+    document.getElementById('statAvgTime2').textContent = totalQuestions > 0 ? `${(responseTimes.reduce((a, b) => a + b, 0) / totalQuestions).toFixed(1)}s` : '0s';
+    document.getElementById('statStreak2').textContent = bestStreak;
+    document.getElementById('statPoints2').textContent = totalPoints;
+
+    const titles = [
+        "A Seed is Planted",
+        "Seeker of Truth",
+        "Awakening Soul",
+        "Karma Yogi",
+        "Master of Action"
+    ];
+
+    const messages = [
+        "The wheel turns. Every attempt brings you closer to understanding.",
+        "You are beginning to see the patterns of action and reaction.",
+        "Your understanding of duty without attachment grows.",
+        "You see through the illusion of doership. Excellent!",
+        "Perfect harmony! You are a true Karma Yogi."
+    ];
+
+    let idx = Math.floor((totalScore / maxPossScore) * titles.length);
+    if(idx >= titles.length) idx = titles.length - 1;
+    
+    document.getElementById('resultTitle2').textContent = titles[idx];
+    document.getElementById('resultMessage2').textContent = messages[idx];
+
+    // Unlock Chapter 3
+    if (percentage >= 50) {
+        if (savedProgress < 3) {
+            localStorage.setItem('mayaProgress', '3');
+        }
+        spawnConfetti(80);
+        showToast('Chapter 3: Dharma Unlocked!', '⚖️');
+    }
+
+    if (totalScore >= maxPossScore && maxPossScore > 0) {
+        spawnConfetti(80);
+        playStreakSound(totalScore);
+        showToast('PERFECT! Master of Action!', '🕉️');
+    }
+}
+
+// Retry Karma
+const retryK = document.getElementById('retryKarmaBtn');
+if(retryK) {
+    retryK.addEventListener('click', () => {
+        totalScore = 0;
+        totalPoints = 0;
+        currentStreak = 0;
+        bestStreak = 0;
+        responseTimes = [];
+        totalQuestions = 0;
+        document.getElementById('pointsDisplay').textContent = '0';
+        updateStreakDisplay();
+        
+        // reset result circle
+        const resultFill = document.getElementById('resultFill2');
+        if (resultFill) resultFill.style.strokeDashoffset = 534;
+        
+        goToStage(10);
+    });
+}
+
+// Home Buttons
+const h1Btn = document.getElementById('homeFromResults1Btn');
+if(h1Btn) h1Btn.addEventListener('click', () => location.reload()); // Reload to show unlocked chapters
+
+const h2Btn = document.getElementById('homeFromKarmaBtn');
+if(h2Btn) h2Btn.addEventListener('click', () => location.reload());
+
+const continueKarmaBtn = document.getElementById('continueKarmaBtn');
+if(continueKarmaBtn) continueKarmaBtn.addEventListener('click', () => {
+    goToStage(10);
 });

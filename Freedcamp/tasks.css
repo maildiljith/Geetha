@@ -1,0 +1,293 @@
+/* ── Tasks Page Styles ─────────────────────────────────────────────────────── */
+
+.tasks-body { background: var(--bg); min-height: 100vh; }
+
+.tasks-layout {
+  position: relative; z-index: 1;
+  max-width: 1400px; margin: 0 auto;
+  padding: 24px 32px 64px;
+}
+
+/* ── Notification Bell ─────────────────────────────────────────────────────── */
+.notif-bell {
+  position: relative;
+  background: var(--glass); border: 1px solid var(--border);
+  color: var(--txt); font-size: 1.15rem;
+  width: 40px; height: 40px;
+  border-radius: 10px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s ease;
+}
+.notif-bell:hover { border-color: var(--blue); transform: scale(1.05); }
+.notif-bell.has-alerts { animation: bellPulse 2s infinite; }
+
+@keyframes bellPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,94,126,0.3); }
+  50% { box-shadow: 0 0 0 8px rgba(255,94,126,0); }
+}
+
+.notif-badge {
+  position: absolute; top: -5px; right: -5px;
+  min-width: 18px; height: 18px; padding: 0 5px;
+  border-radius: 9px; font-size: 0.58rem; font-weight: 800;
+  background: var(--red); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+}
+.notif-badge.hidden { display: none; }
+
+/* ── Notification Panel ────────────────────────────────────────────────────── */
+.notif-overlay {
+  position: fixed; inset: 0; z-index: 999;
+  background: rgba(0,0,0,0.4); backdrop-filter: blur(2px);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.notif-overlay.open { opacity: 1; pointer-events: auto; }
+
+.notif-panel {
+  position: fixed; top: 0; right: -420px;
+  width: 400px; max-width: 90vw; height: 100vh;
+  z-index: 1000;
+  background: var(--card); border-left: 1px solid var(--border);
+  box-shadow: -8px 0 32px rgba(0,0,0,0.3);
+  display: flex; flex-direction: column;
+  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.notif-panel.open { right: 0; }
+
+.notif-panel-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 18px 20px; border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.notif-panel-title {
+  font-size: 0.9rem; font-weight: 700; color: var(--txt);
+  display: flex; align-items: center; gap: 8px;
+}
+.notif-panel-actions { display: flex; gap: 8px; align-items: center; }
+.notif-close {
+  background: none; border: 1px solid var(--border);
+  color: var(--txt2); font-size: 0.85rem;
+  padding: 4px 10px; border-radius: 6px; cursor: pointer;
+  transition: all 0.15s;
+}
+.notif-close:hover { border-color: var(--red); color: var(--red); }
+
+.notif-list {
+  flex: 1; overflow-y: auto; padding: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+
+/* Notification Items */
+.notif-item {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 14px; border-radius: 10px;
+  margin-bottom: 8px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+  transition: all 0.2s ease;
+  animation: slideInRight 0.25s ease;
+}
+.notif-item:hover { background: rgba(255,255,255,0.04); border-color: var(--border); }
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.notif-item.critical { border-left: 3px solid var(--red); }
+.notif-item.warning { border-left: 3px solid var(--orange); }
+.notif-item.info { border-left: 3px solid var(--blue); }
+.notif-item.ai-insight { border-left: 3px solid #a78bfa; }
+
+.notif-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
+.notif-body { flex: 1; min-width: 0; }
+.notif-title { font-size: 0.78rem; font-weight: 600; color: var(--txt); margin-bottom: 3px; }
+.notif-desc { font-size: 0.68rem; color: var(--txt2); line-height: 1.45; }
+.notif-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+.notif-tag {
+  font-size: 0.55rem; padding: 2px 6px; border-radius: 3px;
+  background: rgba(255,255,255,0.05); color: var(--txt3);
+}
+.notif-dismiss {
+  background: none; border: none; color: var(--txt3);
+  cursor: pointer; font-size: 0.75rem; padding: 4px;
+  border-radius: 4px; transition: all 0.15s; flex-shrink: 0;
+}
+.notif-dismiss:hover { color: var(--red); background: rgba(255,94,126,0.1); }
+
+.notif-empty {
+  text-align: center; padding: 40px 20px; color: var(--txt3);
+}
+.notif-empty-icon { font-size: 2rem; margin-bottom: 8px; }
+.notif-empty-title { font-size: 0.85rem; font-weight: 600; color: var(--txt2); }
+.notif-empty-desc { font-size: 0.7rem; margin-top: 4px; }
+
+.notif-section-label {
+  font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--txt3); font-weight: 700;
+  padding: 8px 4px 6px; margin-top: 4px;
+}
+
+/* ── AI Insight Banner ─────────────────────────────────────────────────────── */
+.ai-insight-banner {
+  margin-bottom: 20px;
+}
+.ai-banner-card {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 16px 20px; border-radius: 12px;
+  background: linear-gradient(135deg, rgba(167,139,250,0.06), rgba(78,158,255,0.04));
+  border: 1px solid rgba(167,139,250,0.15);
+  transition: all 0.2s ease;
+}
+.ai-banner-card:hover { border-color: rgba(167,139,250,0.3); }
+.ai-banner-icon { font-size: 1.3rem; flex-shrink: 0; }
+.ai-banner-content { flex: 1; }
+.ai-banner-label {
+  font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.05em;
+  color: #a78bfa; font-weight: 700; margin-bottom: 6px;
+}
+.ai-banner-items {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px;
+}
+.ai-banner-item-title { font-size: 0.78rem; font-weight: 600; color: var(--txt); }
+.ai-banner-item-desc { font-size: 0.68rem; color: var(--txt2); margin-top: 2px; line-height: 1.4; }
+
+.ai-badge {
+  font-size: 0.6rem; padding: 3px 8px; border-radius: 20px;
+  background: linear-gradient(135deg, rgba(167,139,250,0.2), rgba(78,158,255,0.2));
+  color: #a78bfa; font-weight: 600; letter-spacing: 0.03em;
+}
+
+.alerts-reset {
+  font-size: 0.65rem; color: var(--txt3); background: none; border: 1px solid var(--border);
+  padding: 4px 10px; border-radius: 6px; cursor: pointer; transition: all 0.15s;
+}
+.alerts-reset:hover { border-color: var(--blue); color: var(--blue); }
+
+/* ── Stats Bar ─────────────────────────────────────────────────────────────── */
+.task-stats-bar {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;
+  margin-bottom: 24px;
+}
+.task-stat-card {
+  padding: 14px 16px; border-radius: 12px;
+  background: var(--glass); border: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 2px;
+  transition: border-color var(--t);
+}
+.task-stat-card:hover { border-color: var(--border-h); }
+.tsc-val { font-size: 1.3rem; font-weight: 800; }
+.tsc-lbl { font-size: 0.62rem; color: var(--txt3); text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* ── Filters Bar ───────────────────────────────────────────────────────────── */
+.task-filters-bar {
+  display: flex; gap: 10px; align-items: center;
+  margin-bottom: 18px; flex-wrap: wrap;
+}
+.task-search {
+  flex: 1; min-width: 200px;
+  background: var(--glass); border: 1px solid var(--border);
+  color: var(--txt); padding: 9px 14px; border-radius: 8px;
+  font-family: 'Inter', sans-serif; font-size: 0.78rem;
+  outline: none; transition: border-color var(--t);
+}
+.task-search:focus { border-color: var(--blue); }
+.task-search::placeholder { color: var(--txt3); }
+
+.priority-pills { display: flex; gap: 6px; }
+.prio-pill {
+  font-size: 0.68rem; padding: 5px 11px; border-radius: 6px;
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  color: var(--txt2); cursor: pointer; transition: all var(--t);
+}
+.prio-pill:hover { border-color: var(--border-h); }
+.prio-pill.active { background: rgba(78,158,255,0.12); border-color: var(--blue); color: var(--blue); }
+
+/* ── Task Table ────────────────────────────────────────────────────────────── */
+.task-table-wrap {
+  background: var(--glass); border: 1px solid var(--border); border-radius: 14px;
+  overflow: hidden;
+}
+.task-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 0.78rem;
+}
+.task-table thead th {
+  text-align: left; padding: 12px 16px;
+  color: var(--txt3); font-weight: 600; font-size: 0.65rem;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer; user-select: none;
+  transition: color var(--t);
+}
+.task-table thead th:hover { color: var(--txt); }
+.task-table thead th.sorted { color: var(--blue); }
+
+.task-table tbody tr {
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  transition: background var(--t);
+}
+.task-table tbody tr:hover { background: rgba(255,255,255,0.03); }
+.task-table tbody tr:last-child { border-bottom: none; }
+
+.task-table td { padding: 11px 16px; color: var(--txt); vertical-align: middle; }
+
+.task-table .td-title { font-weight: 500; max-width: 350px; }
+.task-table .td-title a {
+  color: var(--txt); text-decoration: none;
+  transition: color var(--t);
+}
+.task-table .td-title a:hover { color: var(--blue); }
+
+/* Priority dots */
+.prio-dot {
+  display: inline-block; width: 8px; height: 8px;
+  border-radius: 50%; margin-right: 6px;
+}
+.prio-dot.high { background: var(--red); }
+.prio-dot.medium { background: var(--orange); }
+.prio-dot.low { background: var(--blue); }
+.prio-dot.none { background: var(--txt3); }
+
+/* Status badges */
+.status-badge {
+  display: inline-block; padding: 3px 8px; border-radius: 4px;
+  font-size: 0.65rem; font-weight: 600;
+}
+.status-badge.in-progress { background: rgba(78,158,255,0.12); color: var(--blue); }
+.status-badge.not-started { background: rgba(255,255,255,0.05); color: var(--txt3); }
+.status-badge.overdue { background: rgba(255,94,126,0.12); color: var(--red); }
+
+/* Due date coloring */
+.due-overdue { color: var(--red); font-weight: 700; }
+.due-soon { color: var(--orange); }
+.due-normal { color: var(--txt2); }
+
+/* Empty state */
+.tasks-empty {
+  text-align: center; padding: 48px 24px;
+  color: var(--txt3); font-size: 0.85rem;
+}
+
+/* Pagination */
+.task-pagination {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 16px; border-top: 1px solid var(--border);
+}
+.page-info { font-size: 0.7rem; color: var(--txt3); }
+.page-btns { display: flex; gap: 6px; }
+.page-btn {
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  color: var(--txt2); padding: 5px 12px; border-radius: 6px;
+  font-size: 0.7rem; cursor: pointer; transition: all var(--t);
+}
+.page-btn:hover { border-color: var(--blue); color: var(--blue); }
+.page-btn:disabled { opacity: 0.3; cursor: default; }
+
+@media (max-width: 900px) {
+  .task-stats-bar { grid-template-columns: repeat(3, 1fr); }
+  .notif-panel { width: 100vw; max-width: 100vw; right: -100vw; }
+}
